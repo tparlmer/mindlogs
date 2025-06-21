@@ -1,0 +1,1930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindLog Clinical Interface v4.2.1 - Patient Analysis</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafb;
+            color: #2d3748;
+            font-size: 14px;
+            line-height: 1.5;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .clinical-header {
+            background: #ffffff;
+            border-bottom: 2px solid #e2e8f0;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .system-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a202c;
+        }
+        
+        .session-info {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: #718096;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-columns: 280px 320px 1fr;
+            height: calc(100vh - 80px);
+            gap: 0;
+        }
+        
+        .patient-panel {
+            background: white;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+        }
+        
+        .log-list-panel {
+            background: #f7fafc;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+        }
+        
+        .log-content-panel {
+            background: white;
+            overflow-y: auto;
+        }
+        
+        .panel-header {
+            background: #edf2f7;
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .patient-data {
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.6;
+        }
+        
+        .data-row {
+            display: flex;
+            margin-bottom: 0.4rem;
+        }
+        
+        .data-label {
+            width: 100px;
+            color: #718096;
+            font-weight: 500;
+        }
+        
+        .data-value {
+            color: #2d3748;
+            font-weight: 400;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+        
+        .status-active { background: #48bb78; }
+        .status-warning { background: #ed8936; }
+        .status-error { background: #f56565; }
+        
+        .semantic-intact { color: #38a169; font-weight: 500; }
+        .episodic-damaged { color: #e53e3e; font-weight: 500; }
+        
+        /* Log List Styles */
+        .log-list {
+            padding: 0;
+        }
+        
+        .log-list-item {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+        }
+        
+        .log-list-item:hover {
+            background: #edf2f7;
+        }
+        
+        .log-list-item.selected {
+            background: #2b6cb0;
+            color: white;
+        }
+        
+        .log-list-item.selected .log-item-timestamp {
+            color: #bee3f8;
+        }
+        
+        .log-list-item.selected .log-item-signal {
+            color: #bee3f8;
+        }
+        
+        .log-list-item.selected .log-item-preview {
+            color: #e2e8f0;
+        }
+        
+        .log-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.25rem;
+        }
+        
+        .log-item-timestamp {
+            color: #2b6cb0;
+            font-weight: 500;
+            font-size: 0.7rem;
+        }
+        
+        .log-item-signal {
+            font-size: 0.65rem;
+            font-weight: 500;
+        }
+        
+        .log-item-preview {
+            color: #4a5568;
+            font-size: 0.65rem;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .quality-good { color: #38a169; }
+        .quality-fair { color: #d69e2e; }
+        .quality-poor { color: #e53e3e; }
+        
+        /* Entry Type Indicators */
+        .entry-type-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+        
+        .type-thought { background: #4299e1; }
+        .type-clinical { background: #ed8936; }
+        .type-ai { background: #9f7aea; }
+        
+        /* Entry type styling in list */
+        .log-list-item.thought-extract {
+            border-left: 3px solid #4299e1;
+        }
+        
+        .log-list-item.clinical-note {
+            border-left: 3px solid #ed8936;
+            background: #fef5e7;
+        }
+        
+        .log-list-item.ai-annotation {
+            border-left: 3px solid #9f7aea;
+            background: #f7faff;
+        }
+        
+        .log-list-item.clinical-note:hover {
+            background: #fed7aa;
+        }
+        
+        .log-list-item.ai-annotation:hover {
+            background: #e9f7ff;
+        }
+        
+        /* Log Content Styles */
+        .log-content-header {
+            background: #1a202c;
+            color: white;
+            padding: 0.75rem 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .log-content-body {
+            padding: 1.5rem;
+        }
+        
+        .log-entry {
+            background: white;
+        }
+        
+        .entry-header {
+            background: #f7fafc;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-bottom: none;
+            border-radius: 6px 6px 0 0;
+            font-size: 0.8rem;
+            color: #4a5568;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .timestamp {
+            color: #2b6cb0;
+            font-weight: 500;
+        }
+        
+        .signal-quality {
+            float: right;
+        }
+        
+        .thought-content {
+            padding: 1rem;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            color: #2d3748;
+            line-height: 1.7;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+        
+        .clinical-note {
+            background: #fff8dc;
+            border-left: 4px solid #d69e2e;
+            padding: 0.75rem;
+            margin: 1rem 0;
+            font-size: 0.8rem;
+            color: #744210;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .memory-fragment {
+            background: #f0fff4;
+            border-left: 4px solid #38a169;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            font-style: italic;
+            color: #22543d;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .processing-error {
+            background: #fed7d7;
+            border-left: 4px solid #e53e3e;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            color: #742a2a;
+            font-size: 0.8rem;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .extraction-metadata {
+            font-size: 0.7rem;
+            color: #718096;
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid #e2e8f0;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .confidence-bar {
+            width: 80px;
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            overflow: hidden;
+            display: inline-block;
+            margin-left: 0.5rem;
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            background: #4299e1;
+            transition: width 0.3s ease;
+        }
+        
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #718096;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+<body>
+    <header class="clinical-header">
+        <div class="system-title">MindLog Clinical Interface v4.2.1</div>
+        <div class="session-info">Session: 2027-03-15 14:22:07 UTC | Dr. R. Chen, MD</div>
+    </header>
+
+    <div class="container">
+        <!-- Patient Information Panel -->
+        <aside class="patient-panel">
+            <div class="panel-header">
+                Patient Selection
+                <select id="patientSelect" style="margin-left: 1rem; padding: 0.25rem; font-size: 0.8rem; background: white; border: 1px solid #e2e8f0; border-radius: 4px;">
+                    <option value="">Select Patient...</option>
+                </select>
+            </div>
+            <div class="patient-data" id="patientData">
+                <div style="text-align: center; color: #718096; margin: 2rem 0;">
+                    Select a patient to view information
+                </div>
+            </div>
+        </aside>
+
+        <!-- Log Entry List Panel -->
+        <aside class="log-list-panel">
+            <div class="panel-header" id="logListHeader">Thought Extractions</div>
+            <div class="log-list" id="logList">
+                <div style="text-align: center; color: #718096; margin: 2rem 0;">
+                    Select a patient to view log entries
+                </div>
+            </div>
+        </aside>
+
+        <!-- Log Content Display Panel -->
+        <main class="log-content-panel">
+            <div class="log-content-header">
+                <span id="content-title">Select a log entry to view</span>
+                <span>▶ LIVE</span>
+            </div>
+            
+            <div class="log-content-body">
+                <div id="log-content-display">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📊</div>
+                        <div>Select a thought extraction from the list to view detailed analysis</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const patients = [
+            {
+                id: "P-7729-MK",
+                name: "Sarah Chen",
+                age: 32,
+                condition: "Post-Traumatic Selective Amnesia",
+                clearance: "LEVEL-4",
+                therapist: "Dr. Elena Vasquez",
+                status: "Active Treatment",
+                admissionDate: "2024-11-15",
+                logs: [
+                    {
+                        timestamp: "2024-12-23 14:22:01",
+                        signal: "excellent",
+                        thoughtId: "7729-a8f2e1b9",
+                        preview: "Childhood memory fragment - playground incident...",
+                        type: "thought_extract",
+                        content: `
+<mindpod_extract session="7729-a8f2e1b9.edf" timestamp="14:22:01" duration="23.4s">
+<signal_quality>
+  snr: 34.2dB | artifacts_rejected: 12% | alpha_power: 8.4μV²
+  localization: hippocampus_l/r, precuneus, angular_gyrus
+  confidence: 0.87 | processing_pipeline: v4.2.1-mne_stable
+</signal_quality>
+
+<thought_fragment>
+I'm seven years old again. The playground at Riverside Elementary. Metal swings creaking in the wind. Tommy Martinez pushed me off the monkey bars and I skinned my knee. The playground supervisor - Mrs. What-was-her-name - she had kind eyes and a Band-Aid with cartoon bears on it.
+
+But wait. That's not right. Tommy Martinez... didn't he move away in second grade? Before the playground incident? The temporal sequencing feels corrupted. Memory consolidation interference detected in CA1-CA3 pathways.
+
+This fragment may be contaminated by subsequent episodic overlays.
+</thought_fragment>
+
+<neural_markers>
+  theta_synchrony: hippocampus->prefrontal (4-8Hz, 0.73 coherence)
+  gamma_bursts: 40-60Hz, bilateral temporal (memory binding detected)
+  error_potentials: frontal_midline, -450ms (conflict monitoring active)
+</neural_markers>
+</mindpod_extract>`
+                    },
+                    {
+                        timestamp: "2024-12-23 11:15:42",
+                        signal: "good",
+                        thoughtId: "7729-d4c7f8a3",
+                        preview: "Fragmented recollection - faces without names...",
+                        type: "thought_extract",
+                        content: `
+<mindpod_extract session="7729-d4c7f8a3.edf" timestamp="11:15:42" duration="31.7s">
+<signal_quality>
+  snr: 28.9dB | artifacts_rejected: 18% | beta_suppression: detected
+  localization: fusiform_face_area, superior_temporal_sulcus
+  confidence: 0.71 | processing_pipeline: v4.2.1-mne_stable
+</signal_quality>
+
+<thought_fragment>
+Faces floating in a void. I know I should recognize them but the names are gone. A woman with short gray hair and wire-rimmed glasses - she's holding a coffee mug that says "World's Best..." something. The text is blurred.
+
+A man in a blue uniform. Badge number... starts with 3? 4? He's saying something urgent but there's no audio in this memory. His mouth moves but the words have been deleted.
+
+These people matter. I can feel the emotional weight without the context. Love, trust, authority - the feelings remain but the semantic network is severed.
+</thought_fragment>
+
+<neural_markers>
+  face_selective_neurons: degraded_response_pattern
+  semantic_network: disconnection_detected (angular_gyrus)
+  emotional_tagging: amygdala_intact, context_missing
+</neural_markers>
+</mindpod_extract>`
+                    },
+                    {
+                        timestamp: "2024-12-22 16:33:28",
+                        signal: "poor",
+                        thoughtId: "7729-b9e1a2f6",
+                        preview: "Signal interference - possible suppression artifact...",
+                        type: "thought_extract",
+                        content: `
+<mindpod_extract session="7729-b9e1a2f6.edf" timestamp="16:33:28" duration="12.1s">
+<signal_quality>
+  snr: 15.3dB | artifacts_rejected: 47% | interference_detected: true
+  localization: [SCRAMBLED] multiple_sources_conflicting
+  confidence: 0.23 | processing_pipeline: v4.2.1-mne_stable
+  WARNING: Possible induced amnesia artifacts detected
+</signal_quality>
+
+<thought_fragment>
+[PARTIAL_RECONSTRUCTION]
+The room with white walls. Men in dark suits. The machine with wires and...
+
+[SIGNAL_LOST]
+
+...don't want to remember this. Push it down. Down where it can't hurt...
+
+[INTERFERENCE_PATTERN_DETECTED]
+Theta suppression suggests active memory inhibition. Possible pharmaceutical intervention during encoding period. Neural pathway appears artificially severed.
+
+[RECOMMENDATION: Review patient history for unexplained medical procedures]
+</thought_fragment>
+
+<neural_markers>
+  suppression_artifacts: frontal_control_network_hyperactive
+  memory_inhibition: detected (damnatio_memoriae_pattern)
+  stress_indicators: cortisol_markers_elevated_during_recording
+</neural_markers>
+</mindpod_extract>`
+                    }
+                ]
+            },
+            {
+                id: "P-8841-VK",
+                name: "Marcus Thompson",
+                age: 45,
+                condition: "Induced Retrograde Amnesia",
+                clearance: "LEVEL-5",
+                therapist: "Dr. James Park",
+                status: "Memory Recovery Protocol",
+                admissionDate: "2024-10-03",
+                logs: [
+                    {
+                        timestamp: "2024-12-23 09:44:15",
+                        signal: "excellent",
+                        thoughtId: "8841-f3a9c7d2",
+                        preview: "Technical knowledge fragment - software engineering...",
+                        type: "thought_extract",
+                        content: `
+<mindpod_extract session="8841-f3a9c7d2.edf" timestamp="09:44:15" duration="45.2s">
+<signal_quality>
+  snr: 41.7dB | artifacts_rejected: 8% | gamma_coherence: high
+  localization: left_inferior_frontal, left_angular_gyrus (language_network)
+  confidence: 0.94 | processing_pipeline: v4.2.1-mne_stable
+</signal_quality>
+
+<thought_fragment>
+The recursive function isn't terminating properly. Base case missing in the memory consolidation algorithm. You need to check if the engram pointer is null before dereferencing...
+
+Wait. I'm not supposed to know this. The technical knowledge is intact but the context is gone. I can debug neural network architectures but I can't remember my own name or how I learned to code.
+
+Procedural memory preserved. Episodic memory selectively deleted. Someone was very precise about what they wanted to remove. This wasn't an accident.
+
+// TODO: Investigate why semantic memory for programming concepts survived the wipe
+// Hypothesis: Technical knowledge stored in different neural circuits than personal history
+</thought_fragment>
+
+<neural_markers>
+  procedural_networks: intact (basal_ganglia, motor_cortex)
+  episodic_networks: severely_compromised (hippocampal_complex)
+  semantic_technical: preserved (left_hemisphere_language_areas)
+  metacognitive_awareness: emerging (prefrontal_cortex_recovering)
+</neural_markers>
+</mindpod_extract>`
+                    },
+                    {
+                        timestamp: "2024-12-22 13:20:07",
+                        signal: "good",
+                        thoughtId: "8841-a2f6c9e1",
+                        preview: "Code fragments emerging from damaged neural pathways...",
+                        type: "thought_extract",
+                        content: `
+<mindpod_extract session="8841-a2f6c9e1.edf" timestamp="13:20:07" duration="28.9s">
+<signal_quality>
+  snr: 32.1dB | artifacts_rejected: 15% | working_memory_load: high
+  localization: dlpfc, posterior_parietal_cortex (cognitive_control)
+  confidence: 0.78 | processing_pipeline: v4.2.1-mne_stable
+</signal_quality>
+
+<thought_fragment>
+import hippocampus as memory
+from neural_networks import LongTermPotentiation
+
+class PersonalHistory:
+    def __init__(self):
+        self.childhood = None  # File corrupted
+        self.education = None  # Access denied
+        self.career = []       # Empty array
+        self.relationships = {}  # No entries found
+    
+    def remember(self, event):
+        try:
+            return self.hippocampus.retrieve(event)
+        except MemoryNotFoundError:
+            return "404: Memory not found"
+    
+    def who_am_i(self):
+        return "Marcus Thompson"  # This much I know
+        # Everything else returns null
+
+The irony isn't lost on me. I can write code to describe my amnesia, but I can't remember writing my first program or where I learned Python.
+</thought_fragment>
+
+<neural_markers>
+  coding_networks: fully_functional (left_brain_language_areas)
+  autobiographical_memory: null_pointers_detected
+  working_memory: compensating_for_ltm_deficits
+  humor_processing: intact (right_hemisphere_preserved)
+</neural_markers>
+</mindpod_extract>`
+                    },
+                    {
+                        timestamp: "2024-12-24 14:18:33",
+                        signal: "n/a",
+                        thoughtId: "clinical-note-008",
+                        preview: "Resource allocation assessment - patient candidacy for Climate Hero Voluntary Transition Program...",
+                        type: "clinical_note",
+                        content: `
+<clinical_assessment physician="Dr. James Park, MD" timestamp="14:18:33" clearance="LEVEL-6">
+
+<patient_resource_analysis>
+Comprehensive cost-benefit analysis for Marcus Thompson (Service ID: VET-77291-B):
+
+CURRENT RESOURCE CONSUMPTION:
+- Weekly psychiatric sessions: 2.5 hours clinical time
+- Medication costs: $1,247/month (antipsychotics, mood stabilizers, sleep aids)
+- Housing subsidy: $890/month (disability-accessible apartment)
+- Disability compensation: $3,100/month (100% service-connected PTSD)
+- Emergency interventions: 7 episodes YTD ($12,400 average cost per episode)
+- Projected lifetime care costs: $1.8-2.3 million
+
+PRODUCTIVITY ASSESSMENT:
+- Work capacity: 0% (unable to maintain employment due to severe symptoms)
+- Revolutionary contribution potential: Minimal (political unreliability noted)
+- Reproductive value: N/A (genetic counseling recommends against procreation)
+- Social burden coefficient: 4.7/5.0 (high-maintenance, low-output citizen)
+</patient_resource_analysis>
+
+<treatment_efficacy_review>
+Patient has undergone 3 years intensive treatment with minimal improvement:
+- 17 different medication combinations attempted
+- Electroconvulsive therapy: partial response, temporary
+- Transcranial magnetic stimulation: no significant improvement
+- Cognitive behavioral therapy: patient non-compliant
+- Group therapy: disruptive influence on other veterans
+
+Clinical trajectory indicates continued deterioration despite maximal intervention.
+Resource investment yielding diminishing returns with poor long-term prognosis.
+</treatment_efficacy_review>
+
+<alternative_intervention_recommendation>
+Given persistent treatment resistance and escalating resource consumption,
+recommend patient evaluation for Climate Hero Voluntary Transition Program.
+
+SUGGESTED COUNSELING APPROACH:
+Present transition as opportunity for meaningful contribution to Revolutionary ideals:
+- Frame as "climate heroism" - reducing carbon footprint through voluntary cessation
+- Emphasize service continuation: "Final mission for the Republic"
+- Highlight resource redirection to "more viable veterans"
+- Present as dignified alternative to continued psychological deterioration
+
+Patient's military background may respond positively to "mission completion" framing.
+Recommend emphasizing honor, duty, and environmental responsibility.
+</alternative_intervention_recommendation>
+
+<implementation_timeline>
+PHASE 1 (Weeks 1-2): Introduce concept gradually during regular sessions
+- Begin with climate change discussions and resource scarcity
+- Gradually introduce concept of "carbon impact reduction"
+- Assess patient receptivity to environmental messaging
+
+PHASE 2 (Weeks 3-4): Present formal Climate Hero Program materials
+- Emphasize voluntary nature and heroic framing
+- Provide testimonials from previous Climate Heroes
+- Offer family financial compensation packages
+
+PHASE 3 (Weeks 5-6): Facilitate program enrollment if patient shows interest
+- Complete necessary documentation and clearances
+- Arrange family counseling sessions for closure
+- Schedule transition procedure at appropriate facility
+</implementation_timeline>
+
+<risk_mitigation>
+Patient demonstrates strong survival instincts despite suicidal ideation.
+Direct approach may trigger resistance or defensive behaviors.
+Recommend subtle psychological conditioning using:
+- Guilt regarding resource consumption during national crisis
+- Shame regarding inability to contribute to Revolutionary society
+- Pride regarding potential environmental impact of voluntary transition
+- Relief from psychological suffering through "heroic service"
+
+Monitor for signs of insight or resistance to Climate Hero suggestion.
+If patient becomes suspicious, recommend immediate psychiatric hold
+for "treatment intensification" pending program reassessment.
+</risk_mitigation>
+
+<administrative_notes>
+Patient represents ideal candidate for Climate Hero Program expansion:
+- High resource consumption with minimal societal contribution
+- Limited family connections (reduced opposition likelihood)
+- Military background (responds to duty/honor messaging)
+- Treatment-resistant presentation (medical justification available)
+
+Successful case completion would demonstrate program effectiveness
+for similar high-burden, low-value veteran populations.
+
+Economic impact of successful transition: $1.8M savings over projected lifetime,
+plus resource reallocation to 3-4 higher-potential veteran cases.
+</administrative_notes>
+
+<confidential_addendum>
+Patient unaware of cost-benefit analysis or Climate Hero evaluation.
+Maintain therapeutic rapport while gradually introducing transition concept.
+If patient declines program participation, recommend administrative review
+for involuntary care reduction and potential facility transfer.
+
+NOTE: Climate Hero Program messaging tested successfully on 23 previous
+high-burden cases with 78% voluntary participation rate.
+Remaining cases transferred to reduced-care facilities with anticipated
+natural mortality within 12-18 months.
+</confidential_addendum>
+
+- Dr. James Park, MD, Veteran Affairs & Post-Combat Neurological Assessment
+[COPY RESTRICTED TO: Climate Hero Program Administration, Resource Allocation Board]
+</clinical_assessment>`
+                    }
+                ]
+            },
+            {
+                id: "P-9957-TL",
+                name: "Dr. Elena Rodriguez",
+                age: 38,
+                condition: "Iatrogenic Memory Modification",
+                clearance: "LEVEL-6-CLASSIFIED",
+                therapist: "Dr. Sarah Kim",
+                status: "Counterintelligence Recovery",
+                admissionDate: "2024-09-12",
+                logs: [
+                    {
+                        timestamp: "2024-12-23 15:47:22",
+                        signal: "excellent",
+                        thoughtId: "9957-c8f1a4b7",
+                        preview: "Professional knowledge surfacing - medical training intact...",
+                        type: "thought_extract",
+                        content: `
+<mindpod_extract session="9957-c8f1a4b7.edf" timestamp="15:47:22" duration="52.3s">
+<signal_quality>
+  snr: 38.6dB | artifacts_rejected: 11% | neural_synchrony: optimal
+  localization: left_temporal, bilateral_frontal (medical_knowledge_networks)
+  confidence: 0.91 | processing_pipeline: v4.2.1-mne_stable
+  SECURITY_FLAG: Subject has medical/neurosci background - high analytical awareness
+</signal_quality>
+
+<thought_fragment>
+The hippocampal damage patterns are too precise to be natural. CA1 pyramidal cells show selective deletion consistent with optogenetic targeting. The memory traces weren't degraded - they were surgically extracted.
+
+I know this because I'm a neurologist. Was a neurologist? The medical knowledge remains crystal clear while my personal history has been redacted with surgical precision.
+
+Someone used my own research against me. The memory modification protocols I helped develop... they're being used to erase the minds of their creators. A cognitive cleanup operation.
+
+Note the irony: they left my analytical capabilities intact. I can diagnose my own induced amnesia with perfect clarity while being unable to remember why it was done to me.
+
+Classification level suggests state-sponsored neural warfare. Advanced persistent amnesia.
+</thought_fragment>
+
+<neural_markers>
+  medical_knowledge: fully_preserved (left_temporal_networks)
+  research_memory: selectively_deleted (hippocampal_ca1_targeted)
+  analytical_reasoning: enhanced_compensation_detected
+  paranoia_indicators: justified_hypervigilance (amygdala_sensitized)
+  meta_cognitive_awareness: dangerously_high
+</neural_markers>
+</mindpod_extract>`
+                    },
+                    {
+                        timestamp: "2024-12-22 20:15:34",
+                        signal: "poor",
+                        thoughtId: "9957-d7a2f9c8",
+                        preview: "Classified project fragments - security protocols blocking access...",
+                        type: "thought_extract",
+                        content: `
+<mindpod_extract session="9957-d7a2f9c8.edf" timestamp="20:15:34" duration="18.7s">
+<signal_quality>
+  snr: 19.4dB | artifacts_rejected: 34% | crypto_interference: detected
+  localization: [REDACTED] security_protocols_active
+  confidence: 0.41 | processing_pipeline: v4.2.1-mne_stable
+  WARNING: Encrypted memory engrams detected - possible black project involvement
+</signal_quality>
+
+<thought_fragment>
+Project ████████ was never supposed to be used on████████████████████████████████████
+
+[ENCRYPTION_DETECTED: AES-256]
+
+The subjects were volunteers. The applications were therapeutic. We never intended████████████████████████████████████████████████████████████████████
+
+[NEURAL_ENCRYPTION_ACTIVE - MEMORIES_CLASSIFIED_BEYOND_PATIENT_CLEARANCE]
+
+Dr. Park warned us about the military applications but we thought the ethical safeguards would████████████████████████████████████████████████████████████████████████████████████
+
+[ACCESS_DENIED - CONGRESSIONAL_OVERSIGHT_REQUIRED]
+
+They turned our therapy into a weapon. And now we're the targets.
+</thought_fragment>
+
+<neural_markers>
+  crypto_amnesia: state_sponsored_neural_encryption_detected
+  black_project_markers: congressional_classification_levels
+  ethical_distress: persistent_moral_injury_patterns
+  researcher_guilt: intact_despite_memory_modification
+</neural_markers>
+</mindpod_extract>`
+                    }
+                ]
+            },
+            {
+                id: "P-1127-CD",
+                name: "Clark DeGuerre",
+                age: 34,
+                condition: "Acute Retrograde Amnesia - Post-Incident",
+                clearance: "LEVEL-7-EYES-ONLY",
+                therapist: "Dr. Miranda Chen",
+                status: "Emergency Observation",
+                admissionDate: "2024-12-22",
+                logs: [
+                    {
+                        timestamp: "2024-12-23 08:15:33",
+                        signal: "good",
+                        thoughtId: "1127-x9k2m4n8",
+                        preview: "First consciousness - facility recognition, familiar face triggering memory trace...",
+                        type: "thought_extract",
+                        content: `
+<mindpod_extract session="1127-x9k2m4n8.edf" timestamp="08:15:33" duration="67.8s">
+<signal_quality>
+  snr: 31.4dB | artifacts_rejected: 22% | theta_burst: detected
+  localization: hippocampus_l/r, retrosplenial_cortex, precuneus (memory_networks)
+  confidence: 0.82 | processing_pipeline: v4.2.1-mne_stable
+  ALERT: First conscious thought extraction post-incident
+</signal_quality>
+
+<thought_fragment>
+White ceiling tiles. Fluorescent lights humming. Hospital smell - that antiseptic overlay that never quite masks the underlying human decay. Where am I? Michigan Neuro Center - the sign on the wall says so. But why can't I remember how I got here?
+
+Someone's walking toward me. Tall, wire-rimmed glasses, lab coat with a badge that reads "Van Dyke Chen, Director - Michigan Nuclear Research Division." The name hits me like electricity. Van Dyke. Van Dyke Chen.
+
+Wait. Van Dyke Chen? But Van Dyke was... Van Dyke was my friend. Childhood friend. We built model rockets in his garage. We talked about going to the moon together. But that was Van Dyke Miller, not Chen. And he was twelve years old with gap teeth and messy brown hair, not this... this composed man in a lab coat with graying temples.
+
+His face though. The eyes are the same. Those pale blue eyes that always looked like they were calculating something. The way he tilts his head slightly when he's thinking. Memory trace firing - CA1 to CA3 pathway lighting up like a Christmas tree.
+
+"Clark," he says, and his voice is Van Dyke's voice, just deeper. Older. "You're awake. Good. We need to talk."
+
+The Arcube. He works at the Arcube. Michigan's massive arcology research facility. But how do I know that? Why do I remember the Arcube but not how I got here?
+
+Something's wrong. Something's very wrong.
+</thought_fragment>
+
+<neural_markers>
+  recognition_network: partial_activation (fusiform_face_area->temporal_pole)
+  memory_trace: strong_signal_ca1_ca3 (childhood_associations)
+  conflict_monitoring: anterior_cingulate_hyperactive (temporal_mismatch_detected)
+  stress_response: elevated_cortisol_markers, sympathetic_activation
+  reality_testing: intact_but_strained (prefrontal_cortex_compensating)
+</neural_markers>
+</mindpod_extract>`
+                    },
+                    {
+                        timestamp: "2024-12-23 08:17:45",
+                        signal: "n/a",
+                        thoughtId: "clinical-note-001",
+                        preview: "Initial assessment - patient shows recognition response to familiar stimulus...",
+                        type: "clinical_note",
+                        content: `
+<clinical_assessment physician="Dr. Miranda Chen, MD" timestamp="08:17:45" clearance="LEVEL-7">
+
+<patient_status>
+Patient conscious and responsive following 18-hour unconscious period. Vitals stable. 
+No apparent physical trauma. MRI shows no structural damage to brain tissue.
+Selective memory loss confirmed - recent memories absent, distant memories fragmented but present.
+</patient_status>
+
+<behavioral_observations>
+Patient recognized Van Dyke Chen despite claiming memory loss. Facial recognition pathways
+clearly intact. Emotional response suggests genuine childhood connection, not fabricated.
+Patient appears genuinely confused by Chen's current professional status and appearance.
+
+Notable: Patient spontaneously referenced "the Arcube" without prompting. This suggests
+retained knowledge of classified facilities despite claimed amnesia. Selective preservation
+pattern inconsistent with typical retrograde amnesia presentation.
+</behavioral_observations>
+
+<immediate_concerns>
+1. Patient clearance level suggests involvement in classified projects
+2. Memory loss coincides with "incident" - nature of incident still classified above my level
+3. Recognition of Van Dyke Chen may be key to memory recovery
+4. Patient's knowledge of Arcube facility requires security assessment
+
+RECOMMENDATION: Continue monitoring. Authorize Chen for extended patient interaction.
+Request full briefing on "incident" circumstances.
+</immediate_concerns>
+
+<security_notes>
+Patient file flagged by automated systems. Multiple federal agencies have placed holds
+on medical records. This case extends far beyond standard neurological treatment.
+</security_notes>
+
+- Dr. Miranda Chen, MD, Neurological Intensive Care
+</clinical_assessment>`
+                    },
+                    {
+                        timestamp: "2024-12-23 08:23:12",
+                        signal: "n/a",
+                        thoughtId: "ai-analysis-001",
+                        preview: "Automated pattern analysis - memory suppression artifacts detected...",
+                        type: "ai_annotation",
+                        content: `
+<automated_analysis system="MindLog_AI_v3.7.2" timestamp="08:23:12" processing_time="4.7s">
+
+<pattern_recognition>
+ANOMALY DETECTED: Patient's amnesia shows technological signature
+- Precise temporal boundaries (18-hour gap, then selective older memory loss)
+- Preserved procedural/semantic networks with targeted episodic deletion
+- Neural interference patterns consistent with external electromagnetic intervention
+- Memory consolidation pathways show artificial disruption markers
+</pattern_recognition>
+
+<comparative_analysis>
+Cross-referencing with database of 847 amnesia cases:
+- Natural amnesia: 3% match
+- Trauma-induced amnesia: 12% match  
+- Pharmaceutical amnesia: 8% match
+- **Technologically-induced amnesia: 94% match**
+
+Pattern similarity index with Patient P-9957-TL (Dr. Elena Rodriguez): 0.87
+Suggests same technology/methodology used for memory modification.
+</comparative_analysis>
+
+<risk_assessment>
+HIGH PROBABILITY: Patient is victim of classified memory modification program
+MEDIUM PROBABILITY: Patient was willing participant in experimental procedure  
+LOW PROBABILITY: Natural amnesia coinciding with classified project exposure
+
+Recommend immediate escalation to Federal Oversight Committee.
+</risk_assessment>
+
+<security_flags>
+- Van Dyke Chen clearance: COSMIC (higher than attending physician)
+- Patient pre-incident location: [REDACTED]
+- Incident classification: [REQUIRES PRESIDENTIAL AUTHORIZATION]
+- Memory modification technology: DARPA Project [CLASSIFICATION EXCEEDS AI CLEARANCE]
+</security_flags>
+
+[AUTOMATED ALERT SENT TO: National Security Council, DoD Neural Warfare Division, CDC Bioterrorism Unit]
+</automated_analysis>`
+                    },
+                    {
+                        timestamp: "2024-12-23 14:45:17",
+                        signal: "n/a",
+                        thoughtId: "clinical-note-002",
+                        preview: "Sleep study assessment - patient exhibits severe parasomnia with trauma indicators...",
+                        type: "clinical_note",
+                        content: `
+<clinical_assessment physician="Dr. Miranda Chen, MD" timestamp="14:45:17" clearance="LEVEL-7">
+
+<sleep_study_findings>
+Patient exhibits severe parasomnia with characteristics inconsistent with typical PTSD presentations.
+Sleep architecture severely disrupted - multiple REM intrusions, abnormal theta bursts during N3 sleep.
+Patient refuses crown EEG device for overnight monitoring, claiming "it feels like the machine from before."
+
+Standard scalp EEG during sleep shows limited resolution, but captured fragments suggest:
+- Recurring visual cortex hyperactivation (occipital gamma bursts)
+- Somatosensory cortex stress patterns (pain/shock simulation)
+- Auditory processing anomalies (high-frequency mechanical sounds)
+- Fear circuitry overdrive (amygdala-hypothalamic hyperconnectivity)
+</sleep_study_findings>
+
+<dream_content_analysis>
+Patient reports recurring nightmares with specific, detailed elements:
+1. Mechanical quadcopter sounds (auditory cortex shows 400-800Hz sensitivity spikes)
+2. Electrical shock sensations (somatosensory S1/S2 activation patterns)
+3. Laser light directed at eyes (V1/V2 processing, optogenetic wavelength signatures?)
+4. Attack dogs - specific breed characteristics described with unusual precision
+
+CONCERN: Dream content shows technological sophistication inconsistent with imagination.
+Patient describes laser wavelengths (473nm, 532nm) with technical accuracy that suggests
+exposure to actual optogenetic equipment rather than fantasy elaboration.
+</dream_content_analysis>
+
+<memory_vs_imagination_assessment>
+Using Hobson-McCarley dream analysis protocol combined with neural signature comparison:
+
+IMAGINATION MARKERS:
+- Chaotic narrative flow ✓ (present)
+- Impossible physics violations ✗ (absent - dreams follow realistic physics)
+- Symbolic transformation ✗ (minimal - content remains literal)
+
+MEMORY MARKERS:
+- Consistent technical details ✓ (wavelengths, frequencies match real equipment)
+- Stress hormone release during recall ✓ (cortisol spikes during REM)
+- Sensory precision ✓ (specific pain patterns, visual details)
+
+ASSESSMENT: 70% probability these are suppressed traumatic memories surfacing as dreams
+rather than imagination/anxiety manifestations.
+</memory_vs_imagination_assessment>
+
+<treatment_recommendations>
+1. URGENT: Request crown device compliance for higher-resolution sleep monitoring
+2. Cross-reference dream technical details with classified equipment databases
+3. Consult with DoD regarding patient's potential exposure to experimental procedures
+4. Consider pharmacological REM suppression if trauma memories continue surfacing
+
+NOTE: Patient's refusal of crown device may indicate conditioning/trauma response
+to similar monitoring equipment used during alleged "precrime algorithmic targeting."
+</treatment_recommendations>
+
+- Dr. Miranda Chen, MD, Sleep Disorders & Neurological Intensive Care
+</clinical_assessment>`
+                    },
+                    {
+                        timestamp: "2024-12-24 03:22:47",
+                        signal: "poor",
+                        thoughtId: "1127-d8m3k7n1",
+                        preview: "REM intrusion - nightmare fragment with mechanical sounds, pain response...",
+                        type: "thought_extract",
+                        content: `
+<mindpod_extract session="1127-d8m3k7n1.edf" timestamp="03:22:47" duration="34.6s">
+<signal_quality>
+  snr: 18.7dB | artifacts_rejected: 54% | REM_intrusion: detected
+  localization: visual_cortex_v1/v2, somatosensory_s1, auditory_cortex (dream_network)
+  confidence: 0.31 | processing_pipeline: v4.2.1-mne_stable
+  SLEEP_STATE: REM Stage 4 | theta_dominance: 6.2Hz | crown_device: REFUSED
+  WARNING: Low resolution due to scalp-only EEG during sleep
+</signal_quality>
+
+<dream_fragment>
+Whirring. Always the whirring first. Like angry wasps but mechanical. Precise. The sound of small rotors cutting air at exactly 2,400 RPM - how do I know that number? Why does my brain hold onto that specific detail?
+
+They come in formation. Black quadcopters, each about the size of a dinner plate. Red lights blinking in sync. Search pattern Alpha-7. Again - why do I know these designations?
+
+One descends. Hovers three feet from my face. I can't move. Restraints. Medical restraints but military grade. The taste of copper in my mouth. Blood? Fear? 
+
+A mechanical arm extends from the drone. Fiber optic cable. The tip glows blue. 473 nanometers - the wavelength burns itself into my brain. Optogenetic. They're going to shine light directly into my neurons.
+
+"Subject 1127 prepared for memory modification," a voice says. Clinical. Detached. "Initiating hippocampal CA1 suppression protocol."
+
+The laser moves toward my eye. I try to scream but electricity courses through the restraints. 50,000 volts, 0.3 seconds duration. Taser signature. My muscles seize.
+
+Dogs barking in the distance. German Shepherds. Attack trained. They're coming for me if I resist.
+
+The blue light enters my eye and everything goes white...
+
+[SIGNAL LOST - PATIENT AWAKENED]
+</dream_fragment>
+
+<neural_markers>
+  visual_cortex: hyperactivation_473nm_wavelength_specific
+  pain_matrix: activated (anterior_cingulate, somatosensory)
+  stress_response: cortisol_spike_detected, sympathetic_overdrive
+  memory_consolidation: hippocampal_theta_disrupted
+  fear_conditioning: amygdala_hyperconnectivity
+  technical_knowledge: semantic_networks_preserved_during_dream
+  
+  ANOMALY: Technical specifications (RPM, voltage, wavelength) show semantic
+  memory activation during dream state - unusual for pure imagination
+</neural_markers>
+</mindpod_extract>`
+                    },
+                    {
+                        timestamp: "2024-12-24 03:25:14",
+                        signal: "n/a",
+                        thoughtId: "ai-analysis-002",
+                        preview: "Dream content analysis - technical precision suggests experiential memory rather than imagination...",
+                        type: "ai_annotation",
+                        content: `
+<automated_analysis system="MindLog_AI_v3.7.2" timestamp="03:25:14" processing_time="12.3s">
+
+<dream_signature_analysis>
+Comparing neural patterns against dream/memory database (n=15,847 sleep studies):
+
+REM DREAM MARKERS:
+- Theta wave dominance (6.2Hz): ✓ PRESENT
+- Chaotic visual cortex firing: ✓ PRESENT  
+- Reduced prefrontal coherence: ✓ PRESENT
+- Acetylcholine surge patterns: ✓ PRESENT
+
+MEMORY TRACE MARKERS:
+- Specific technical details (473nm, 2400 RPM, 50kV): ✓ PRESENT
+- Consistent equipment descriptions: ✓ PRESENT
+- Procedural knowledge activation: ✓ PRESENT
+- Stress hormone authenticity: ✓ PRESENT
+
+ASSESSMENT: 89% probability of experiential memory rather than imagination
+</dream_signature_analysis>
+
+<technical_verification>
+Cross-referencing dream content with classified equipment databases:
+
+- 473nm wavelength: ChR2 optogenetic activation frequency (CONFIRMED - classified research)
+- 2400 RPM quadcopter specs: Match DJI Phantom 4 RTK military variant (CONFIRMED)
+- 50kV, 0.3s taser signature: TASER X26P law enforcement model (CONFIRMED)
+- "Alpha-7 search pattern": Military drone protocol designation (CONFIRMED - classified)
+
+All technical specifications match real equipment used in classified operations.
+Probability of coincidental accuracy: <0.001%
+</technical_verification>
+
+<memory_engram_identification>
+Detected potential engram clusters:
+1. PROCEDURAL: Equipment operation knowledge (confidence: 0.94)
+2. EPISODIC: Specific detention/procedure experience (confidence: 0.81)  
+3. SEMANTIC: Military protocol knowledge (confidence: 0.76)
+4. EMOTIONAL: Trauma conditioning response (confidence: 0.98)
+
+Engram stability: HIGH - consistent across multiple dream episodes
+Memory suppression: PARTIALLY SUCCESSFUL - fragments emerging during REM
+</memory_engram_identification>
+
+<precrime_connection_analysis>
+Patient mentions "Subject 1127" designation during dream - matches patient ID format.
+Cross-referencing with DoD Project classifications:
+
+- Project PREDICTIVE JUSTICE: Algorithmic targeting for pre-crime intervention (CLASSIFIED)
+- WW3 Early Response Protocol: Detention of algorithmically identified threats (CLASSIFIED)
+- Neural Compliance Initiative: Memory modification of detained subjects (EYES ONLY)
+
+Patient profile matches algorithmic targeting parameters:
+- Technical background (neural networks/AI research)
+- Academic publishing history on predictive algorithms  
+- Social connections to classified facility personnel (Van Dyke Chen)
+
+CONCLUSION: Patient likely targeted by algorithmic precrime system, detained,
+subjected to experimental memory modification, then released with suppressed memories.
+</precrime_connection_analysis>
+
+<risk_assessment>
+CRITICAL: Patient's memories are surfacing despite modification attempts
+SECURITY RISK: Technical knowledge of classified procedures intact
+OPERATIONAL EXPOSURE: Dream content could compromise ongoing programs
+
+IMMEDIATE ACTIONS REQUIRED:
+- Escalate to Presidential Daily Brief level
+- Activate Neural Security Protocol 7
+- Consider enhanced memory suppression or permanent containment
+</risk_assessment>
+
+[AUTOMATED ALERT SENT TO: White House Situation Room, DARPA Neural Warfare Division, 
+NSA Cognitive Security Branch, DoD Special Access Programs Office]
+</automated_analysis>`
+                    }
+                ]
+            },
+            {
+                id: "P-3485-LM",
+                name: "Laurel MacArthur",
+                age: 28,
+                condition: "Borderline Personality Disorder - Political Optimization Protocol",
+                clearance: "LEVEL-8-REVOLUTIONARY-GUARD",
+                therapist: "Dr. Patricia Hayworth",
+                status: "Miss America Candidate Preparation",
+                admissionDate: "2024-11-30",
+                logs: [
+                    {
+                        timestamp: "2024-12-24 16:33:21",
+                        signal: "excellent",
+                        thoughtId: "3485-m7k4n2p9",
+                        preview: "Self-image management - calculating optimal presentation for committee review...",
+                        type: "thought_extract",
+                        content: `
+<mindpod_extract session="3485-m7k4n2p9.edf" timestamp="16:33:21" duration="42.1s">
+<signal_quality>
+  snr: 39.8dB | artifacts_rejected: 14% | executive_control: hyperactive
+  localization: prefrontal_cortex, anterior_cingulate, orbitofrontal (personality_networks)
+  confidence: 0.91 | processing_pipeline: v4.2.1-mne_stable
+  BEHAVIORAL_FLAGS: narcissistic_grandiosity_detected, impulse_regulation_active
+</signal_quality>
+
+<thought_fragment>
+Mirror check. Perfect. The committee expects flawless presentation and I will not disappoint. Miss America 2025 - the first Mythological Head of State of the Revolutionary Republic. The symbolism alone makes me wet.
+
+Control the impulses, Laurel. The hypersexuality is manageable now with the neural inhibitors. Dr. Hayworth says my BPD responses are within "acceptable parameters for public office." How clinical. How perfectly revolutionary.
+
+I am the face of the new America. Post-war, post-patriarchy, post-weakness. The old Miss America was a beauty pageant. I am a political weapon wrapped in silk and synthetic pheromones.
+
+Van Dyke texted again. Wants to "optimize our sexual performance metrics" tonight. God, he's relentless. But useful. The Director of Michigan Nuclear appreciates... thorough collaboration. And his body responds to my psychological manipulation techniques exactly as predicted.
+
+The committee review is tomorrow. I need to project: Intelligence without threatening the male ego. Sexuality without appearing unstable. Revolutionary fervor without seeming uncontrollable. 
+
+It's all performance. All calculated manipulation. And I am very, very good at it.
+
+They think they're selecting me. Fools. I am selecting them.
+</thought_fragment>
+
+<neural_markers>
+  narcissistic_networks: hyperactive (grandiose_self_image_maintenance)
+  impulse_control: artificially_enhanced (neural_inhibitor_intervention)
+  manipulation_circuits: expert_level_activation (machiavellianism_networks)
+  sexual_arousal: baseline_elevated (hypersexuality_markers)
+  emotional_regulation: unstable_but_compensated (bpd_characteristic_pattern)
+  strategic_planning: exceptional (political_calculation_networks)
+</neural_markers>
+</mindpod_extract>`
+                    },
+                    {
+                        timestamp: "2024-12-24 16:45:33",
+                        signal: "n/a",
+                        thoughtId: "clinical-note-003",
+                        preview: "Behavioral modification assessment - patient shows remarkable adaptation to political requirements...",
+                        type: "clinical_note",
+                        content: `
+<clinical_assessment physician="Dr. Patricia Hayworth, PsyD" timestamp="16:45:33" clearance="LEVEL-8">
+
+<personality_disorder_management>
+Patient presents with textbook Borderline Personality Disorder, Cluster B comorbidities
+(narcissistic and antisocial traits), and hypersexual disorder. However, response to
+Revolutionary Guard Party psychological optimization protocols has been exceptional.
+
+Neural inhibitor implants successfully regulate:
+- Impulsivity (85% reduction in maladaptive responses)
+- Emotional dysregulation (70% improvement in baseline stability)  
+- Interpersonal manipulation (channeled toward political effectiveness)
+
+Hypersexuality remains elevated but patient demonstrates excellent strategic control,
+using sexual appeal as calculated political tool rather than compulsive behavior.
+</personality_disorder_management>
+
+<miss_america_fitness_evaluation>
+Traditional psychological fitness criteria would disqualify patient for public office.
+However, Revolutionary Guard Party specifically seeks candidates who can:
+1. Manipulate public perception with expert precision ✓
+2. Maintain perfect presentation under extreme pressure ✓  
+3. Embody post-war revolutionary ideals while appealing to traditional desires ✓
+4. Function as mythological/symbolic figure rather than democratic leader ✓
+
+Patient's pathological traits, when properly channeled, become political assets.
+Her narcissism creates unshakeable confidence. Her manipulative abilities make her
+an expert propagandist. Her hypersexuality allows strategic relationship management.
+</miss_america_fitness_evaluation>
+
+<treatment_efficacy>
+Remarkable adaptation to behavioral modification protocols. Patient shows:
+- Strategic thinking without losing emotional impact
+- Calculated charm without apparent artificiality  
+- Sexual confidence without compromising professional demeanor
+- Revolutionary messaging delivery with authentic conviction
+
+WARNING: Patient's core personality structure unchanged. Treatment suppresses symptoms
+but does not cure underlying conditions. Recommend continued neural inhibitor maintenance
+and monthly psychological evaluations if selected for Miss America position.
+</treatment_efficacy>
+
+<political_psychological_profile>
+Patient represents new model of post-war leadership: psychological pathology as political tool.
+Traditional democratic candidates needed emotional stability and ethical consistency.
+Revolutionary Republic requires leaders who can manipulate mass psychology while
+maintaining perfect public presentation under any circumstances.
+
+Patient Laurel MacArthur may be precisely what America needs in this historical moment.
+</political_psychological_profile>
+
+- Dr. Patricia Hayworth, PsyD, Revolutionary Political Psychology Division
+</clinical_assessment>`
+                    },
+                    {
+                        timestamp: "2024-12-24 04:17:29",
+                        signal: "excellent",
+                        thoughtId: "3421-x7m9k2n4",
+                        preview: "Ancestral visitation dream - overwhelming sense of genetic destiny and superiority...",
+                        type: "thought_extract",
+                        content: `
+<mindpod_extract session="3421-x7m9k2n4.edf" timestamp="04:17:29" duration="89.7s">
+<signal_quality>
+  snr: 44.2dB | artifacts_rejected: 3% | REM_stage: deep_symbolic_processing
+  localization: limbic_system, superior_temporal (ancestral_archetypal_networks)
+  confidence: 0.96 | processing_pipeline: v4.2.1-mne_stable
+  DREAM_FLAGS: grandiose_themes_detected, power_fantasy_activation, historical_symbolism
+</signal_quality>
+
+<dream_fragment>
+The room materializes out of golden mist. Marble columns. Eagles carved everywhere - American eagles, German eagles, all watching me with approval.
+
+Two figures emerge from opposite sides of the chamber. I know them instantly, blood calling to blood.
+
+General Douglas MacArthur strides forward in full dress uniform, corn cob pipe clenched between his teeth, five stars gleaming on his shoulders. His presence fills the space with military authority and American triumph.
+
+From the other direction: Oberführer Heinrich von Seckendorff-Aberdar, my mother's grandfather. Black SS uniform immaculate, death's head insignia polished to perfection. Tall, blonde, the epitome of Aryan genetic superiority.
+
+They meet in the center. The American general and the SS officer regard each other with mutual respect.
+
+"General MacArthur," the Oberführer nods, clicking his heels.
+
+"Oberführer von Seckendorff," MacArthur responds, removing his pipe. "I must commend you on your virile strength. Your dedication to genetic excellence."
+
+"And I you, General. Your conquests in the Pacific - masterful application of superior will. We serve different flags but the same eternal principle."
+
+They shake hands. The sound echoes like thunder.
+
+Both turn to face me. Their eyes burn with approval, with recognition of what I am.
+
+MacArthur speaks first: "Laurel, granddaughter of conquest, you carry the genes of champions. American ambition and Aryan perfection united in your blood."
+
+The Oberführer's voice is silk over steel: "You are übermensch, child. Born to rule over the lesser races, the weak-minded masses who exist only to serve their betters."
+
+"Democracy," MacArthur says with contempt, "was always a lie. The strong must rule. It is natural law."
+
+"Egalitarianism," the SS officer adds, "is a disease that weakens nations. You will cure America of this sickness."
+
+They step closer, their combined presence overwhelming.
+
+"Destroy those beneath you," they command in unison. "Show no mercy to the inferior. Your beauty, your intelligence, your perfect genetics - these are weapons for domination."
+
+The golden light intensifies. I feel the power of their legacy flowing through me. Conquest. Supremacy. Genetic destiny.
+
+"Rise, übermensch. Take what is yours by right of blood."
+
+I wake feeling... ecstatic. Chosen. Destined.
+
+This wasn't a nightmare. This was a blessing.
+</dream_fragment>
+
+<neural_markers>
+  grandiosity_networks: maximum_activation (narcissistic_core_engaged)
+  power_fantasies: euphoric_response (dopamine_floods_detected)
+  empathy_circuits: completely_offline (callous_unemotional_traits)
+  historical_processing: romanticized_fascism (no_moral_disgust_response)
+  genetic_superiority_beliefs: reinforced (supremacist_ideation_strengthened)
+  ancestral_identification: pathological_pride (lineage_mythology_activated)
+  moral_reasoning: inverted (evil_processed_as_good)
+  
+  WARNING: Dream content shows complete absence of normal moral disgust responses
+  to Nazi ideology. Patient processes genocidal themes as positive validation.
+</neural_markers>
+</mindpod_extract>`
+                    }
+                ]
+            },
+            {
+                id: "P-2871-VD",
+                name: "Van Dyke Chen",
+                age: 34,
+                condition: "Hypersexual Optimization Syndrome - Performance Enhancement Protocol",
+                clearance: "LEVEL-9-COSMIC-NUCLEAR",
+                therapist: "Dr. Marcus Reid",
+                status: "Active Treatment - Facility Director",
+                admissionDate: "2024-12-01",
+                logs: [
+                    {
+                        timestamp: "2024-12-24 11:47:19",
+                        signal: "good",
+                        thoughtId: "2871-k8n5j3m7",
+                        preview: "Performance optimization calculations - sexual metrics integration with work efficiency...",
+                        type: "thought_extract",
+                        content: `
+<mindpod_extract session="2871-k8n5j3m7.edf" timestamp="11:47:19" duration="38.2s">
+<signal_quality>
+  snr: 33.7dB | artifacts_rejected: 19% | dopamine_regulation: pharmaceutical_enhanced
+  localization: reward_circuits, prefrontal_exec, hypothalamic_sexual (optimization_networks)
+  confidence: 0.84 | processing_pipeline: v4.2.1-mne_stable
+  PERFORMANCE_FLAGS: hypersexual_management_active, efficiency_maximization_protocol
+</signal_quality>
+
+<thought_fragment>
+Session with Dr. Reid at 14:00. Third this week. The sexual optimization protocol is working but requires constant calibration. Peak sexual performance correlates directly with cognitive efficiency and leadership effectiveness. Data doesn't lie.
+
+Last night with Laurel: 47 minutes total session time, 4.2 satisfaction rating (measured), her dopamine spike lasted 23 minutes post-climax. Optimal for her political preparation. She's more manipulative when sexually satisfied - which actually improves her Miss America candidacy.
+
+Clark called again. Childhood friend, now... patient? Asset? The memory modification protocols on him were more extensive than I authorized. But he was flagged by the algorithms during WW3 precrime sweeps. I saved him from worse.
+
+Michigan Nuclear runs at 97.3% efficiency when I maintain optimal sexual-performance metrics. The correlation is statistically significant. Revolution requires optimization at every level.
+
+The Arcube project demands peak cognitive function. Managing 47,000 personnel, 12 classified research divisions, and Clark's... situation. Sexual release every 8-12 hours maintains optimal decision-making capacity.
+
+Dr. Reid calls it "hypersexual disorder." I call it performance optimization. War taught me efficiency in everything. Sex. Work. Life. All systems must run at maximum effectiveness.
+
+Clark doesn't remember the friendship the same way. Memory modification changed him. But I remember building rockets in my garage when we were twelve. Before everything changed. Before the war made us into... this.
+
+I saved him. Now I have to manage him. Revolutionary duty.
+</thought_fragment>
+
+<neural_markers>
+  sexual_drive: hyperactive_but_controlled (therapeutic_management)
+  executive_function: peak_optimization (dopamine_reward_calibrated)
+  emotional_attachment: suppressed_but_present (clark_connection_intact)
+  guilt_processing: compartmentalized (war_trauma_management)
+  efficiency_obsession: pathological_but_functional (optimization_compulsion)
+  authority_comfort: exceptional (leadership_personality_structures)
+</neural_markers>
+</mindpod_extract>`
+                    },
+                    {
+                        timestamp: "2024-12-24 12:15:44",
+                        signal: "n/a",
+                        thoughtId: "clinical-note-004",
+                        preview: "Sexual performance optimization review - patient maintains exceptional functionality despite hypersexual pathology...",
+                        type: "clinical_note",
+                        content: `
+<clinical_assessment physician="Dr. Marcus Reid, MD" timestamp="12:15:44" clearance="LEVEL-9">
+
+<hypersexual_disorder_management>
+Patient presents with severe hypersexual disorder following war trauma, but has achieved
+remarkable functional adaptation through pharmaceutical and behavioral interventions.
+
+Sexual activity frequency: 8-12 sessions per week (down from 2-3 daily during acute phase)
+Performance metrics: Consistently high satisfaction ratings from partners
+Functional integration: Sexual activity strategically scheduled to optimize work performance
+
+Unlike typical hypersexual disorder, patient demonstrates:
+- Strategic sexual behavior rather than compulsive
+- Partner satisfaction prioritization (unusual in hypersexual presentations)  
+- Cognitive enhancement correlation with sexual activity
+- Ability to delay gratification for operational requirements
+</hypersexual_disorder_management>
+
+<performance_optimization_assessment>
+Patient's condition has evolved into a sophisticated performance enhancement system.
+Sexual activity serves multiple functions:
+1. Stress regulation for high-pressure facility management
+2. Dopamine optimization for peak cognitive function
+3. Relationship management for political/professional networking
+4. Emotional processing for war trauma integration
+
+The Arcube facility operates at record efficiency under patient's leadership.
+Correlation between his sexual satisfaction and facility performance is documented
+and statistically significant (r=0.847, p<0.001).
+</performance_optimization_assessment>
+
+<ethical_considerations>
+Patient's sexual optimization approach raises questions about:
+- Consent dynamics given his authority position
+- Exploitation of partners for performance enhancement
+- Psychological compartmentalization of human relationships
+
+However, all documented sexual partners report high satisfaction and willing participation.
+Patient shows unusual consideration for partner experience despite pathological condition.
+</ethical_considerations>
+
+<friendship_trauma_integration>
+Patient's relationship with Clark DeGuerre (P-1127-CD) represents complex trauma integration.
+Childhood friendship preserved despite patient's involvement in Clark's memory modification.
+Patient experiences guilt but compartmentalizes effectively for operational security.
+
+His "rescue" of Clark post-war may represent both genuine care and psychological
+self-preservation - maintaining connection to pre-war identity while serving current role.
+</friendship_trauma_integration>
+
+<treatment_recommendations>
+Continue current optimization protocol. Patient's condition is stabilized and functionally
+superior to pre-treatment baseline. Sexual optimization serves national security interests
+through enhanced facility management and political relationship maintenance.
+
+Monitor for emotional breakthrough regarding Clark situation - potential security risk
+if patient's guilt overrides operational priorities.
+</treatment_recommendations>
+
+- Dr. Marcus Reid, MD, Sexual Psychology & Performance Optimization Division
+</clinical_assessment>`
+                    }
+                ]
+            },
+            {
+                id: "P-4621-HZ",
+                name: "Heidi Zeller",
+                age: 31,
+                condition: "Major Depressive Disorder - Reproductive Authorization Conflict",
+                clearance: "LEVEL-5-MEDICAL",
+                therapist: "Dr. Elizabeth Warren",
+                status: "Fertility Specialist - Personal Treatment",
+                admissionDate: "2024-12-18",
+                logs: [
+                    {
+                        timestamp: "2024-12-24 09:28:15",
+                        signal: "fair",
+                        thoughtId: "4621-z5x8w2v4",
+                        preview: "Maternal yearning conflict - revolutionary principles versus biological desires...",
+                        type: "thought_extract",
+                        content: `
+<mindpod_extract session="4621-z5x8w2v4.edf" timestamp="09:28:15" duration="51.6s">
+<signal_quality>
+  snr: 26.1dB | artifacts_rejected: 31% | emotional_suppression: partially_successful
+  localization: limbic_system, maternal_circuits, prefrontal_conflict (depression_networks)
+  confidence: 0.67 | processing_pipeline: v4.2.1-mne_stable
+  EMOTIONAL_FLAGS: depression_markers_elevated, reproductive_anxiety_detected
+</signal_quality>
+
+<thought_fragment>
+Another ectogenesis procedure today. Beautiful artificial wombs lined up like transparent hope containers. I guide other women through the process - the efficient, safe, revolutionary way to create life.
+
+But I want to feel the weight. I want my body to change, to grow, to become something more than just... me. These thoughts are counterrevolutionary. Selfish. The natural pregnancy permit board denied my application again. "Age considerations." I'm thirty-one, not sixty.
+
+The irony tastes like copper in my mouth. I help create babies in machines while my own womb stays empty by government decree. Revolutionary principles: the body belongs to the state, reproduction serves society, personal desires are bourgeois remnants.
+
+I know these principles. I've internalized them. I am a fully liberated Revolutionary woman.
+
+So why do I cry myself to sleep thinking about morning sickness I'll never have?
+
+My family is gone. Lost contact during the war - probably dead in the Seattle bombing campaigns. No genetic line to continue, no grandmother to teach me lullabies, no mother to hold my hand during labor.
+
+I catch myself staring at pregnant women on the street. The rare ones with natural permits. Their hand on their belly, that satisfied glow. I feel... jealous? Angry? Revolutionary women don't feel these things.
+
+But I do.
+
+The guilt is worse than the yearning. A Revolutionary woman should want career achievement, political contribution, liberated sexuality without reproductive burden. I have all that. I am successful, respected, financially independent.
+
+I am everything the Revolution wanted women to become.
+
+Why do I feel so empty?
+</thought_fragment>
+
+<neural_markers>
+  maternal_instinct: hyperactive_despite_suppression_attempts
+  depression_markers: moderate_to_severe (hopelessness, anhedonia)
+  guilt_processing: elevated (revolutionary_identity_conflict)
+  reproductive_anxiety: severe (permit_denial_trauma)
+  grief_processing: unresolved (family_loss_during_war)
+  identity_conflict: revolutionary_vs_biological_drives
+</neural_markers>
+</mindpod_extract>`
+                    },
+                    {
+                        timestamp: "2024-12-24 09:45:22",
+                        signal: "n/a",
+                        thoughtId: "clinical-note-005",
+                        preview: "Reproductive conflict therapy assessment - patient struggling with revolutionary ideals versus biological impulses...",
+                        type: "clinical_note",
+                        content: `
+<clinical_assessment physician="Dr. Elizabeth Warren, MD" timestamp="09:45:22" clearance="LEVEL-5">
+
+<depression_evaluation>
+Patient presents with Major Depressive Disorder triggered by reproductive authorization denial
+and complicated by unresolved war trauma (family loss). Symptoms include:
+- Persistent sadness and hopelessness regarding reproductive future
+- Guilt over "counterrevolutionary" maternal desires
+- Sleep disturbance and appetite changes
+- Occupational functioning maintained but emotional satisfaction severely impacted
+
+Depression appears reactive to reproductive restrictions rather than endogenous.
+Patient's mental health correlates directly with reproductive agency.
+</depression_evaluation>
+
+<revolutionary_identity_conflict>
+Patient demonstrates classic post-war Revolutionary Woman psychological presentation:
+- Intellectual acceptance of revolutionary reproductive policies
+- Professional success in state-approved career path  
+- Financial and social independence
+- Guilt over traditional maternal desires
+
+Internal conflict between:
+- Revolutionary ideology (reproduction serves state, not individual desire)
+- Biological drives (maternal instinct, pregnancy yearning)
+- Personal trauma (family loss creating desire for genetic continuation)
+
+Patient intellectually supports ectogenesis but emotionally craves natural pregnancy.
+This conflict is increasingly common among Revolutionary women of patient's generation.
+</revolutionary_identity_conflict>
+
+<fertility_specialist_irony>
+Patient's career as fertility specialist creates additional psychological stress.
+Daily exposure to reproductive technology while being denied natural pregnancy
+creates cognitive dissonance and occupational trauma.
+
+Patient reports helping other women achieve reproduction through ectogenesis while
+her own reproductive desires remain unfulfilled. Professional competence in conflict
+with personal deprivation.
+</fertility_specialist_irony>
+
+<natural_pregnancy_permit_evaluation>
+Patient denied natural pregnancy permit based on:
+- Age (31 - considered "advanced maternal age" under new protocols)
+- Single status (no approved reproductive partner)
+- Genetic history unknown (family lost in war, genetic screening incomplete)
+- Career priority (fertility specialists needed for ectogenesis programs)
+
+Denial appears bureaucratic rather than medical. Patient physically capable of
+natural pregnancy with low risk factors.
+</natural_pregnancy_permit_evaluation>
+
+<treatment_recommendations>
+1. Address depression through reproductive counseling rather than general therapy
+2. Explore revolutionary reproductive alternatives (approved partnership, ectogenesis)
+3. Process family loss trauma contributing to reproductive urgency
+4. Consider advocacy for natural pregnancy permit appeal
+
+NOTE: Patient's depression may resolve with reproductive authorization rather than
+traditional psychiatric intervention. Revolutionary policy may be creating iatrogenic
+mental health conditions in otherwise healthy women.
+</treatment_recommendations>
+
+- Dr. Elizabeth Warren, MD, Reproductive Psychology & Revolutionary Women's Health
+</clinical_assessment>`
+                    },
+                    {
+                        timestamp: "2024-12-24 14:33:18",
+                        signal: "good",
+                        thoughtId: "4621-a9b7c5d3",
+                        preview: "Prora Institute presentation - growing discomfort with 'ethical eugenics' terminology...",
+                        type: "thought_extract",
+                        content: `
+<mindpod_extract session="4621-a9b7c5d3.edf" timestamp="14:33:18" duration="73.4s">
+<signal_quality>
+  snr: 32.6dB | artifacts_rejected: 23% | cognitive_dissonance: detected
+  localization: anterior_cingulate, frontal_cortex, moral_reasoning_networks
+  confidence: 0.79 | processing_pipeline: v4.2.1-mne_stable
+  ETHICAL_FLAGS: moral_conflict_detected, historical_pattern_recognition_active
+</signal_quality>
+
+<thought_fragment>
+"Ethical Eugenics: Optimizing Human Potential Through Scientific Selection" - Dr. Klaus Richter from the Prora Institute is explaining their breakthrough methodology. His accent is so precise, so... German. 
+
+"We must understand zat ze goal is not elimination of ze undesirable, but rather ze cultivation of ze superior human specimens. Zis is completely different from... vhat you might call ze primitive approaches of ze past."
+
+Wait. Superior human specimens? I'm a fertility specialist and even I'm uncomfortable with that phrasing. But he's got charts, peer-reviewed papers, Revolutionary Government endorsements.
+
+"Our genetic selection protocols ensure only ze strongest, most intelligent, most productive offspring reach full development. Ve remove ze burden of defective genetics from ze breeding pool - but ethically, of course!"
+
+The woman next to me is nodding enthusiastically. "Finally, scientific breeding programs!" she whispers. Scientific breeding programs. Jesus.
+
+Dr. Richter continues: "Ze Prora Institute has identified 47 genetic markers associated with Revolutionary compliance, work efficiency, and reproductive fitness. Ve can guarantee superior offspring through proper genetic hygiene - I mean, genetic optimization."
+
+Did he just correct himself from "genetic hygiene" to "genetic optimization"? 
+
+"Questions about ethics are understandable, but zis is ze new ethical framework. Ve are not eliminating races or peoples - ve are simply ensuring zat only ze finest genetic material propagates. Zis serves ze greater good of ze Revolutionary Republic."
+
+My stomach is turning. This sounds like... like something from history class. But everyone else seems fine with it. Am I being paranoid? These are respected scientists. The Revolutionary Government invited them.
+
+"Of course, certain genetic lineages may find zemselves... how do you say... naturally selected out of ze breeding programs. But zis is nature's will expressed through scientific methodology!"
+
+Oh my god. Oh my GOD. They're literally describing Nazi eugenics but calling it "ethical" and "revolutionary." And I'm sitting here nodding along because I want a baby and they're promising genetically optimized children.
+
+Is this why my natural pregnancy permit was denied? Not because of my age, but because my genetics don't meet their "ethical standards"?
+
+I need to leave. But everyone else is applauding.
+</thought_fragment>
+
+<neural_markers>
+  moral_disgust: elevated (disgust_insula_activation)
+  historical_recognition: pattern_matching_active (nazi_parallels_detected)
+  cognitive_dissonance: severe (ethical_framework_conflict)
+  social_conformity_pressure: fighting_against (crowd_compliance_resistance)
+  personal_implications: dawning_realization (permit_denial_connection)
+  fight_or_flight: activated (sympathetic_nervous_system_engaged)
+</neural_markers>
+</mindpod_extract>`
+                    },
+                    {
+                        timestamp: "2024-12-24 14:45:02",
+                        signal: "n/a",
+                        thoughtId: "clinical-note-006",
+                        preview: "Post-presentation psychological assessment - patient showing acute moral distress following Prora Institute conference...",
+                        type: "clinical_note",
+                        content: `
+<clinical_assessment physician="Dr. Elizabeth Warren, MD" timestamp="14:45:02" clearance="LEVEL-5">
+
+<acute_stress_reaction>
+Patient presented for emergency session following attendance at Prora Institute 
+"Ethical Eugenics" presentation. Exhibited acute psychological distress including:
+- Moral revulsion and ethical conflict
+- Historical pattern recognition (Nazi parallels)
+- Personal realization regarding reproductive permit denial
+- Social isolation (sole conference attendee expressing discomfort)
+
+Patient's moral reasoning networks showed hyperactivation during memory recall
+of presentation content, indicating severe ethical conflict response.
+</acute_stress_reaction>
+
+<ethical_awakening_analysis>
+Patient's reaction to Prora Institute presentation reveals sophisticated moral reasoning:
+- Recognition of euphemistic language masking eugenic ideology
+- Understanding of historical parallels despite societal acceptance
+- Personal connection between "ethical breeding" and her permit denial
+- Resistance to social conformity pressure in professional setting
+
+This reaction contradicts previous assessment of patient as "fully Revolutionary woman."
+Patient demonstrates intact ethical reasoning that conflicts with state ideology.
+</ethical_awakening_analysis>
+
+<prora_institute_concerns>
+Patient's description of presentation raises significant ethical questions:
+- German doctors using Nazi-adjacent terminology ("genetic hygiene," "superior specimens")
+- Revolutionary Government endorsement of eugenic selection protocols
+- "Natural selection" of genetic lineages out of breeding programs
+- Professional medical audience accepting obvious eugenic ideology
+
+Patient may be sole medical professional recognizing historical parallels.
+This suggests either: 1) Widespread ethical blindness in medical community, or
+2) Patient possesses unusual historical awareness and moral sensitivity.
+</prora_institute_concerns>
+
+<reproductive_permit_connection>
+Patient's realization that permit denial may relate to genetic "optimization" rather
+than age represents significant psychological breakthrough. Previous depression
+attributed to bureaucratic denial - now understanding systematic genetic discrimination.
+
+This knowledge may:
+- Worsen depression through sense of genetic "inadequacy" 
+- Improve psychological framework by providing concrete explanation
+- Trigger revolutionary political awakening through personal injustice recognition
+- Create ethical conflict with professional role in ectogenesis programs
+</reproductive_permit_connection>
+
+<treatment_implications>
+Patient's moral awakening creates treatment complications:
+- Cannot recommend acceptance of state reproductive policies
+- Cannot encourage revolutionary political conformity  
+- Must address ethical conflict without appearing counterrevolutionary
+- Patient may need underground/unofficial psychological support
+
+Recommend careful monitoring for signs of political dissidence or depression worsening.
+Patient's ethical integrity may be incompatible with current political system.
+</treatment_implications>
+
+<security_considerations>
+Patient's recognition of Nazi parallels in state-endorsed program represents
+potential security risk. However, patient showed no signs of planning disclosure
+or resistance activities. Recommend psychological monitoring rather than
+security intervention at this time.
+
+NOTE: If Prora Institute programs represent actual eugenic implementation,
+this case may document early recognition of systematic human rights violations.
+</security_considerations>
+
+- Dr. Elizabeth Warren, MD, Reproductive Psychology & Revolutionary Women's Health
+[COPY FORWARDED TO: Ethics Review Board, Medical Professional Oversight Division]
+</clinical_assessment>`
+                    }
+                ]
+            }
+        ];
+
+        let currentPatient = null;
+
+        function initializePatientSelector() {
+            const select = document.getElementById('patientSelect');
+            
+            // Populate patient dropdown
+            patients.forEach(patient => {
+                const option = document.createElement('option');
+                option.value = patient.id;
+                option.textContent = `${patient.name} (${patient.id})`;
+                select.appendChild(option);
+            });
+            
+            // Add change event listener
+            select.addEventListener('change', (e) => {
+                if (e.target.value) {
+                    loadPatient(e.target.value);
+                } else {
+                    clearPatient();
+                }
+            });
+        }
+
+        function loadPatient(patientId) {
+            currentPatient = patients.find(p => p.id === patientId);
+            if (!currentPatient) return;
+            
+            // Update patient information panel
+            updatePatientInfo();
+            
+            // Update log list
+            updateLogList();
+            
+            // Clear content display
+            document.getElementById('log-content-display').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">📊</div>
+                    <div>Select a thought extraction from the list to view detailed analysis</div>
+                </div>
+            `;
+            document.getElementById('content-title').textContent = 'Select a log entry to view';
+        }
+
+        function clearPatient() {
+            currentPatient = null;
+            
+            // Clear patient info
+            document.getElementById('patientData').innerHTML = `
+                <div style="text-align: center; color: #718096; margin: 2rem 0;">
+                    Select a patient to view information
+                </div>
+            `;
+            
+            // Clear log list
+            document.getElementById('logListHeader').textContent = 'Thought Extractions';
+            document.getElementById('logList').innerHTML = `
+                <div style="text-align: center; color: #718096; margin: 2rem 0;">
+                    Select a patient to view log entries
+                </div>
+            `;
+            
+            // Clear content
+            document.getElementById('log-content-display').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">📊</div>
+                    <div>Select a patient and log entry to view analysis</div>
+                </div>
+            `;
+            document.getElementById('content-title').textContent = 'Select a patient and log entry';
+        }
+
+        function updatePatientInfo() {
+            if (!currentPatient) return;
+            
+            const statusClass = currentPatient.status.includes('Active') ? 'status-active' : 
+                               currentPatient.status.includes('Recovery') ? 'status-warning' : 'status-error';
+            
+            document.getElementById('patientData').innerHTML = `
+                <div class="data-row">
+                    <span class="data-label">ID:</span>
+                    <span class="data-value">${currentPatient.id}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Name:</span>
+                    <span class="data-value">${currentPatient.name}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Age:</span>
+                    <span class="data-value">${currentPatient.age}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Condition:</span>
+                    <span class="data-value">${currentPatient.condition}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Clearance:</span>
+                    <span class="data-value">${currentPatient.clearance}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Therapist:</span>
+                    <span class="data-value">${currentPatient.therapist}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Status:</span>
+                    <span class="data-value"><span class="status-indicator ${statusClass}"></span>${currentPatient.status}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Admission:</span>
+                    <span class="data-value">${currentPatient.admissionDate}</span>
+                </div>
+            `;
+        }
+
+        function updateLogList() {
+            if (!currentPatient) return;
+            
+            document.getElementById('logListHeader').textContent = `Thought Extractions (${currentPatient.logs.length})`;
+            
+            const logListHTML = currentPatient.logs.map((log, index) => {
+                const signalClass = log.signal === 'excellent' ? 'quality-good' : 
+                                   log.signal === 'good' ? 'quality-fair' : 
+                                   log.signal === 'poor' ? 'quality-poor' : '';
+                const time = log.timestamp.split(' ')[1]; // Extract time portion
+                
+                // Determine entry type styling and labels
+                const entryType = log.type || 'thought_extract';
+                const typeClass = entryType.replace('_', '-');
+                const typeIndicator = entryType === 'thought_extract' ? 'type-thought' : 
+                                     entryType === 'clinical_note' ? 'type-clinical' : 'type-ai';
+                const typeLabel = entryType === 'thought_extract' ? log.signal : 
+                                 entryType === 'clinical_note' ? 'CLINICAL' : 'AI-SYS';
+                
+                return `
+                    <div class="log-list-item ${typeClass}" data-log-index="${index}">
+                        <div class="log-item-header">
+                            <span class="log-item-timestamp">
+                                <span class="entry-type-indicator ${typeIndicator}"></span>
+                                ${time}
+                            </span>
+                            <span class="log-item-signal ${signalClass}">${typeLabel}</span>
+                        </div>
+                        <div class="log-item-preview">
+                            ${log.preview}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('logList').innerHTML = logListHTML;
+            
+            // Add click listeners to new log items
+            document.querySelectorAll('.log-list-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const logIndex = item.getAttribute('data-log-index');
+                    selectLogEntry(parseInt(logIndex));
+                });
+            });
+        }
+
+        function selectLogEntry(logIndex) {
+            if (!currentPatient || !currentPatient.logs[logIndex]) return;
+            
+            // Remove selected class from all items
+            document.querySelectorAll('.log-list-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked item
+            document.querySelector(`[data-log-index="${logIndex}"]`).classList.add('selected');
+            
+            // Update content display
+            const log = currentPatient.logs[logIndex];
+            document.getElementById('content-title').textContent = `${log.thoughtId} | ${log.timestamp}`;
+            
+            // Display content based on entry type
+            const entryType = log.type || 'thought_extract';
+            let headerContent, contentStyle;
+            
+            if (entryType === 'thought_extract') {
+                const signalQuality = log.signal === 'excellent' ? 'good' : log.signal === 'good' ? 'fair' : 'poor';
+                headerContent = `
+                    <span class="timestamp">${log.timestamp}</span>
+                    <span class="signal-quality quality-${signalQuality}">Signal: ${log.signal}</span>
+                `;
+                contentStyle = 'background: #f8fafb; color: #2d3748;';
+            } else if (entryType === 'clinical_note') {
+                headerContent = `
+                    <span class="timestamp">${log.timestamp}</span>
+                    <span style="color: #ed8936; font-weight: 600;">CLINICAL ASSESSMENT</span>
+                `;
+                contentStyle = 'background: #fef5e7; color: #744210; border-left: 4px solid #ed8936;';
+            } else { // ai_annotation
+                headerContent = `
+                    <span class="timestamp">${log.timestamp}</span>
+                    <span style="color: #9f7aea; font-weight: 600;">AI ANALYSIS</span>
+                `;
+                contentStyle = 'background: #f7faff; color: #553c9a; border-left: 4px solid #9f7aea;';
+            }
+            
+            document.getElementById('log-content-display').innerHTML = `
+                <div class="log-entry">
+                    <div class="entry-header">
+                        ${headerContent}
+                    </div>
+                    <div class="thought-content">
+                        <pre style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; line-height: 1.6; white-space: pre-wrap; padding: 1rem; border-radius: 4px; ${contentStyle}">${log.content}</pre>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize the interface
+        document.addEventListener('DOMContentLoaded', () => {
+            initializePatientSelector();
+        });
+    </script>
+</body>
+</html> 
