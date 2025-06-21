@@ -58,7 +58,7 @@ https://www.nature.com/articles/s41467-024-46926-0
 
 ## Concept Overview
 
-The **MindLog format** represents a revolutionary narrative medium that combines webcomics with clinical documentation interfaces. By presenting fictional stories through the lens of authentic medical technology (EEG-based thought extraction), this format creates an SCP Foundation-style documentary realism that makes fiction feel like discovered reality.
+The **MindLog format** represents a revolutionary narrative medium that combines webcomics with clinical documentation interfaces. Set in the year **2039**, this format presents fictional stories through the lens of authentic medical technology (EEG-based thought extraction), creating an SCP Foundation-style documentary realism that makes fiction feel like discovered reality.
 
 ## Core Innovation
 
@@ -312,9 +312,9 @@ The format naturally supports episodic storytelling:
 
 ## Story Universe Potential
 
-### Character Universe: Post-WW3 America
+### Character Universe: Post-WW3 America (2039)
 
-The MindLog format explores a near-future America recovering from WW3, where algorithmic governance, revolutionary politics, and advanced neurotechnology intersect with deeply human psychological struggles.
+The MindLog format explores America in 2039, recovering from WW3, where algorithmic governance, revolutionary politics, and advanced neurotechnology intersect with deeply human psychological struggles.
 
 #### **Core Characters**
 

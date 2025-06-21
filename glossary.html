@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindLog Clinical Reference Guide v4.2.1</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafb;
+            color: #2d3748;
+            font-size: 14px;
+            line-height: 1.6;
+            padding: 2rem;
+        }
+        
+        .header {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            color: #718096;
+            margin-bottom: 1rem;
+        }
+        
+        .meta-info {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: #a0aec0;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 1rem;
+        }
+        
+        .navigation {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .nav-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+        
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 0.5rem;
+        }
+        
+        .nav-link {
+            color: #2b6cb0;
+            text-decoration: none;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        
+        .nav-link:hover {
+            background: #edf2f7;
+            text-decoration: underline;
+        }
+        
+        .section {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.5rem;
+        }
+        
+        .term {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #f7fafc;
+        }
+        
+        .term:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .term-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2b6cb0;
+            margin-bottom: 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .term-type {
+            font-size: 0.8rem;
+            color: #a0aec0;
+            font-style: italic;
+            margin-bottom: 0.75rem;
+        }
+        
+        .term-content {
+            margin-bottom: 1rem;
+        }
+        
+        .clinical-significance {
+            background: #f0fff4;
+            border-left: 4px solid #38a169;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .clinical-significance strong {
+            color: #22543d;
+        }
+        
+        .normal-range {
+            background: #fef5e7;
+            border-left: 4px solid #ed8936;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .normal-range strong {
+            color: #744210;
+        }
+        
+        .interpretation {
+            background: #e6fffa;
+            border-left: 4px solid #319795;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .interpretation strong {
+            color: #1d4044;
+        }
+        
+        .related-terms {
+            margin-top: 0.75rem;
+            font-size: 0.9rem;
+        }
+        
+        .related-terms strong {
+            color: #4a5568;
+        }
+        
+        .related-terms a {
+            color: #2b6cb0;
+            text-decoration: none;
+            margin-right: 1rem;
+        }
+        
+        .related-terms a:hover {
+            text-decoration: underline;
+        }
+        
+        .warning {
+            background: #fed7d7;
+            border-left: 4px solid #e53e3e;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border-radius: 0 4px 4px 0;
+            color: #742a2a;
+        }
+        
+        .code-block {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            margin: 0.5rem 0;
+            overflow-x: auto;
+        }
+        
+        .back-link {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2b6cb0;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+        
+        .back-link:hover {
+            background: #2c5282;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-link">← Return to Interface</a>
+    
+    <div class="header">
+        <h1 class="title">MindLog Clinical Reference Guide</h1>
+        <p class="subtitle">Neurotechnology Terminology for Medical Professionals</p>
+        <div class="meta-info">
+            Version 4.2.1 | Michigan Neurological Research Division | 2039<br>
+            Classification: MEDICAL-PROFESSIONAL | Distribution: Authorized Personnel Only
+        </div>
+    </div>
+    
+    <div class="navigation">
+        <h2 class="nav-title">Quick Navigation</h2>
+        <div class="nav-grid">
+            <a href="#signal-processing" class="nav-link">Signal Processing & EEG</a>
+            <a href="#neuroanatomy" class="nav-link">Neuroanatomy & Brain Networks</a>
+            <a href="#memory-systems" class="nav-link">Memory Systems</a>
+            <a href="#neurotechnology" class="nav-link">Advanced Neurotechnology</a>
+            <a href="#clinical-protocols" class="nav-link">Clinical Protocols</a>
+            <a href="#security-clearance" class="nav-link">Security & Legal Framework</a>
+        </div>
+    </div>
+    
+    <section id="signal-processing" class="section">
+        <h2 class="section-title">Signal Processing & EEG Technology</h2>
+        
+        <div class="term">
+            <h3 class="term-name">Signal-to-Noise Ratio (SNR)</h3>
+            <p class="term-type">EEG Quality Measurement</p>
+            <div class="term-content">
+                <p>Fundamental measurement of neural signal quality versus background electrical noise, expressed in decibels (dB).</p>
+                
+                <div class="clinical-significance">
+                    <strong>Clinical Significance:</strong> Primary indicator of thought extraction reliability. Lower SNR may indicate memory suppression, active interference, or psychological resistance to neural monitoring.
+                </div>
+                
+                <div class="normal-range">
+                    <strong>Normal Range:</strong> 25-45 dB for standard EEG procedures. Values above 35 dB considered excellent for memory extraction protocols.
+                </div>
+                
+                <div class="interpretation">
+                    <strong>Interpretation:</strong> Values below 20 dB suggest significant interference - possible memory modification artifacts, electronic countermeasures, or induced amnesia. Values above 40 dB indicate optimal conditions for deep memory access.
+                </div>
+            </div>
+            <div class="related-terms">
+                <strong>Related Terms:</strong> 
+                <a href="#artifact-rejection">Artifact Rejection</a>
+                <a href="#neural-coherence">Neural Coherence</a>
+                <a href="#processing-pipeline">Processing Pipeline</a>
+            </div>
+        </div>
+        
+        <div class="term">
+            <h3 class="term-name">Artifact Rejection Percentage</h3>
+            <p class="term-type">Signal Processing Parameter</p>
+            <div class="term-content">
+                <p>Percentage of neural data automatically discarded due to contamination from eye movements, muscle tension, electrical interference, or other non-brain sources.</p>
+                
+                <div class="clinical-significance">
+                    <strong>Clinical Significance:</strong> High rejection rates often indicate subject stress, deception, or active memory blocking. Normal physiological artifacts typically account for 5-15% rejection.
+                </div>
+                
+                <div class="normal-range">
+                    <strong>Normal Range:</strong> 8-20% for cooperative subjects in clinical settings. Rejection rates above 30% require investigation.
+                </div>
+                
+                <div class="interpretation">
+                    <strong>Interpretation:</strong> Rates above 40% suggest active resistance to neural monitoring or presence of memory modification countermeasures. Rates below 5% may indicate artificial neural enhancement or pharmaceutical intervention.
+                </div>
+            </div>
+        </div>
+        
+        <div class="term">
+            <h3 class="term-name">MNE-Python Processing Pipeline</h3>
+            <p class="term-type">Software Framework</p>
+            <div class="term-content">
+                <p>Open-source neuroscience software suite used for EEG/MEG analysis. Current institutional standard v4.2.1-mne_stable represents significant advancement over pre-war neural processing capabilities.</p>
+                
+                <div class="clinical-significance">
+                    <strong>Clinical Significance:</strong> Software version numbers indicate processing capabilities and institutional standards. Older versions may lack advanced memory extraction algorithms developed post-2037.
+                </div>
+                
+                <div class="warning">
+                    <strong>Security Note:</strong> Version discrepancies between facilities may indicate unauthorized modifications or classified processing enhancements.
+                </div>
+            </div>
+        </div>
+        
+        <div class="term">
+            <h3 class="term-name">Brain Wave Classifications</h3>
+            <p class="term-type">Neural Oscillation Patterns</p>
+            <div class="term-content">
+                <p>Frequency-based categorization of brain electrical activity, each associated with specific cognitive and emotional states.</p>
+                
+                <div class="code-block">
+Delta (0.5-4Hz):  Deep sleep, unconscious processing
+Theta (4-8Hz):    Memory consolidation, REM sleep, deep meditation
+Alpha (8-12Hz):   Relaxed awareness, memory retrieval comfort
+Beta (13-30Hz):   Active thinking, cognitive strain
+Gamma (30-100Hz): Memory binding, conscious awareness
+                </div>
+                
+                <div class="clinical-significance">
+                    <strong>Clinical Significance:</strong> Abnormal wave patterns may indicate memory modification, pharmaceutical intervention, or psychological resistance. Theta synchrony particularly important for memory extraction protocols.
+                </div>
+                
+                <div class="interpretation">
+                    <strong>Interpretation:</strong> Theta suppression suggests active memory inhibition. Gamma bursts indicate successful memory consolidation. Beta dominance may indicate anxiety or deception.
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="neuroanatomy" class="section">
+        <h2 class="section-title">Neuroanatomy & Brain Networks</h2>
+        
+        <div class="term">
+            <h3 class="term-name">Hippocampus CA1-CA3 Pathways</h3>
+            <p class="term-type">Memory Formation Circuitry</p>
+            <div class="term-content">
+                <p>Critical anatomical subregions within the hippocampus responsible for memory encoding, consolidation, and retrieval. CA1 and CA3 refer to specific cellular fields within the hippocampal formation.</p>
+                
+                <div class="clinical-significance">
+                    <strong>Clinical Significance:</strong> Primary target for memory modification procedures. Precise damage patterns in these areas strongly suggest technological intervention rather than natural amnesia.
+                </div>
+                
+                <div class="interpretation">
+                    <strong>Interpretation:</strong> Selective CA1 pyramidal cell damage consistent with optogenetic targeting. CA3 disruption affects pattern completion and memory recall. Intact CA fields with disrupted connectivity suggest pharmaceutical memory blocking.
+                </div>
+                
+                <div class="warning">
+                    <strong>Security Alert:</strong> Artificial damage patterns may indicate exposure to classified memory modification protocols.
+                </div>
+            </div>
+        </div>
+        
+        <div class="term">
+            <h3 class="term-name">Fusiform Face Area (FFA)</h3>
+            <p class="term-type">Specialized Visual Processing Region</p>
+            <div class="term-content">
+                <p>Brain region specifically dedicated to face recognition and processing. Located in the fusiform gyrus of the temporal lobe.</p>
+                
+                <div class="clinical-significance">
+                    <strong>Clinical Significance:</strong> Damage here explains selective amnesia patterns where patients recognize emotional significance of faces but lose identity information. Commonly preserved in targeted memory modification to maintain social functioning.
+                </div>
+                
+                <div class="interpretation">
+                    <strong>Interpretation:</strong> Degraded response patterns suggest semantic network disconnection rather than visual processing damage. Intact FFA with disrupted connections indicates surgical memory modification.
+                </div>
+            </div>
+        </div>
+        
+        <div class="term">
+            <h3 class="term-name">Angular Gyrus</h3>
+            <p class="term-type">Semantic Memory Hub</p>
+            <div class="term-content">
+                <p>Critical brain region for semantic memory, conceptual knowledge, and language processing. Functions as integration hub for different types of information.</p>
+                
+                <div class="clinical-significance">
+                    <strong>Clinical Significance:</strong> Preservation of angular gyrus function explains retained technical knowledge despite episodic memory loss. Demonstrates sophisticated understanding of memory system organization in modification procedures.
+                </div>
+                
+                <div class="interpretation">
+                    <strong>Interpretation:</strong> Disconnection detected in angular gyrus suggests targeted disruption of semantic networks while preserving procedural knowledge. May indicate selective memory modification protocols.
+                </div>
+            </div>
+        </div>
+        
+        <div class="term">
+            <h3 class="term-name">Prefrontal-Hippocampal Networks</h3>
+            <p class="term-type">Executive Memory Control</p>
+            <div class="term-content">
+                <p>Neural pathways connecting prefrontal cortex with hippocampal formation, essential for memory consolidation, retrieval, and executive control of memory processes.</p>
+                
+                <div class="clinical-significance">
+                    <strong>Clinical Significance:</strong> Coherence measurements between these regions indicate successful versus disrupted memory formation. Low coherence suggests artificial disconnection or pharmaceutical intervention.
+                </div>
+                
+                <div class="normal-range">
+                    <strong>Normal Coherence:</strong> 0.6-0.8 during memory consolidation tasks. Values below 0.4 indicate significant disruption.
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="memory-systems" class="section">
+        <h2 class="section-title">Memory Systems & Consolidation</h2>
+        
+        <div class="term">
+            <h3 class="term-name">Episodic vs. Semantic Memory</h3>
+            <p class="term-type">Memory System Classification</p>
+            <div class="term-content">
+                <p>Fundamental distinction in memory research between personal experiences (episodic) and factual knowledge (semantic).</p>
+                
+                <div class="clinical-significance">
+                    <strong>Clinical Significance:</strong> Selective preservation creates realistic amnesia patterns that maintain character competence while erasing personal history. Key indicator of artificial memory modification.
+                </div>
+                
+                <div class="interpretation">
+                    <strong>Interpretation:</strong> Preserved semantic memory with disrupted episodic memory is hallmark of technological memory modification. Natural amnesia typically affects both systems.
+                </div>
+                
+                <div class="code-block">
+Episodic Memory:  Personal experiences, autobiographical events
+                  "I remember graduating from medical school"
+
+Semantic Memory:  Factual knowledge, concepts, skills
+                  "Medical school requires 4 years of study"
+                </div>
+            </div>
+        </div>
+        
+        <div class="term">
+            <h3 class="term-name">Memory Engrams</h3>
+            <p class="term-type">Physical Memory Traces</p>
+            <div class="term-content">
+                <p>Physical memory traces stored in specific neural network patterns. Represents the biological substrate of memory storage.</p>
+                
+                <div class="clinical-significance">
+                    <strong>Clinical Significance:</strong> "Encrypted engrams" suggest memories can be technologically locked while remaining physically intact. Based on cutting-edge research into memory trace localization and manipulation.
+                </div>
+                
+                <div class="warning">
+                    <strong>Classification Note:</strong> Engram manipulation technology classified at COSMIC level. Encrypted memory patterns may indicate exposure to black projects.
+                </div>
+            </div>
+        </div>
+        
+        <div class="term">
+            <h3 class="term-name">Long-Term Potentiation (LTP)</h3>
+            <p class="term-type">Memory Formation Mechanism</p>
+            <div class="term-content">
+                <p>Cellular mechanism underlying memory formation and storage. Involves strengthening of synaptic connections between neurons.</p>
+                
+                <div class="clinical-significance">
+                    <strong>Clinical Significance:</strong> Disrupted LTP explains memory formation failures without affecting existing memories. Can be artificially induced or blocked through pharmaceutical or electromagnetic intervention.
+                </div>
+                
+                <div class="interpretation">
+                    <strong>Interpretation:</strong> Selective LTP disruption indicates targeted memory modification during specific time periods. May explain gaps in memory formation during detention or treatment.
+                </div>
+            </div>
+        </div>
+        
+        <div class="term">
+            <h3 class="term-name">Memory Consolidation</h3>
+            <p class="term-type">Memory Stabilization Process</p>
+            <div class="term-content">
+                <p>Process by which short-term memories are converted into stable long-term memories. Involves hippocampal-neocortical dialogue and occurs primarily during sleep.</p>
+                
+                <div class="clinical-significance">
+                    <strong>Clinical Significance:</strong> Disrupted consolidation explains why patients may remember events immediately after occurrence but lose them within hours or days. Key target for memory modification protocols.
+                </div>
+                
+                <div class="interpretation">
+                    <strong>Interpretation:</strong> Artificial consolidation disruption creates precise temporal boundaries for memory loss. Natural consolidation failure typically shows gradual, imprecise memory degradation.
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="neurotechnology" class="section">
+        <h2 class="section-title">Advanced Neurotechnology</h2>
+        
+        <div class="term">
+            <h3 class="term-name">Optogenetics</h3>
+            <p class="term-type">Light-Controlled Neural Modification</p>
+            <div class="term-content">
+                <p>Technique using light to control neural activity with cellular precision. Requires genetic modification to make neurons sensitive to specific wavelengths.</p>
+                
+                <div class="clinical-significance">
+                    <strong>Clinical Significance:</strong> Explains precise, surgical memory deletion without broader brain damage. 473nm wavelength commonly used for ChR2 channelrhodopsin activation.
+                </div>
+                
+                <div class="warning">
+                    <strong>Security Alert:</strong> Optogenetic memory modification represents classified technology. Exposure indicators include wavelength-specific neural responses and precise temporal memory boundaries.
+                </div>
+                
+                <div class="code-block">
+Common Wavelengths:
+473nm - Blue light, ChR2 activation (memory suppression)
+532nm - Green light, neural recording
+593nm - Yellow light, halorhodopsin inhibition
+                </div>
+            </div>
+        </div>
+        
+        <div class="term">
+            <h3 class="term-name">Neural Coherence</h3>
+            <p class="term-type">Brain Connectivity Measurement</p>
+            <div class="term-content">
+                <p>Mathematical correlation between different brain regions' electrical activity. Indicates functional connectivity and communication between neural networks.</p>
+                
+                <div class="normal-range">
+                    <strong>Normal Range:</strong> 0.6-0.9 for functionally connected regions during active tasks. Values below 0.4 indicate significant disconnection.
+                </div>
+                
+                <div class="interpretation">
+                    <strong>Interpretation:</strong> Low coherence indicates severed connections, high coherence shows intact networks. Artificial coherence patterns may indicate neural enhancement or modification.
+                </div>
+            </div>
+        </div>
+        
+        <div class="term">
+            <h3 class="term-name">Confidence Scores</h3>
+            <p class="term-type">AI Processing Reliability</p>
+            <div class="term-content">
+                <p>Machine learning probability estimates for thought extraction and memory reconstruction accuracy. Scale from 0.0 (no confidence) to 1.0 (complete certainty).</p>
+                
+                <div class="normal-range">
+                    <strong>Normal Range:</strong> 0.7-0.95 for clear thought extraction. Scores below 0.5 indicate significant uncertainty or data corruption.
+                </div>
+                
+                <div class="interpretation">
+                    <strong>Interpretation:</strong> Low confidence suggests corrupted or artificially modified memories. Extremely high confidence (>0.95) may indicate artificial neural enhancement or data fabrication.
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="clinical-protocols" class="section">
+        <h2 class="section-title">Clinical Protocols & Data Formats</h2>
+        
+        <div class="term">
+            <h3 class="term-name">EDF File Format</h3>
+            <p class="term-type">European Data Format</p>
+            <div class="term-content">
+                <p>Standard format for storing EEG and other medical time series data. Files with .edf extension contain raw neural recordings and metadata.</p>
+                
+                <div class="clinical-significance">
+                    <strong>Clinical Significance:</strong> Authentic medical data management format. Presence of EDF files indicates legitimate clinical data collection and storage protocols.
+                </div>
+            </div>
+        </div>
+        
+        <div class="term">
+            <h3 class="term-name">Thought Extraction Sessions</h3>
+            <p class="term-type">Clinical Procedure</p>
+            <div class="term-content">
+                <p>Formal neural monitoring sessions designed to extract and analyze thought patterns, memories, and cognitive processes using advanced EEG technology.</p>
+                
+                <div class="clinical-significance">
+                    <strong>Clinical Significance:</strong> Session duration, signal quality, and extraction success rates provide insight into subject cooperation, memory integrity, and potential modification history.
+                </div>
+                
+                <div class="normal-range">
+                    <strong>Typical Duration:</strong> 15-60 seconds for thought fragments. Sessions over 90 seconds may indicate deep memory excavation or forced extraction protocols.
+                </div>
+            </div>
+        </div>
+        
+        <div class="term">
+            <h3 class="term-name">REM Intrusion Monitoring</h3>
+            <p class="term-type">Sleep State Analysis</p>
+            <div class="term-content">
+                <p>Monitoring of REM (Rapid Eye Movement) sleep intrusions during wake states or other sleep stages. Often indicates trauma, memory suppression, or artificial sleep architecture modification.</p>
+                
+                <div class="clinical-significance">
+                    <strong>Clinical Significance:</strong> REM intrusions often contain suppressed memories attempting to surface. Critical for detecting memory modification aftereffects and trauma processing.
+                </div>
+                
+                <div class="interpretation">
+                    <strong>Interpretation:</strong> Multiple REM intrusions with consistent content suggest authentic suppressed memories. Random intrusions may indicate artificial memory insertion or psychological manipulation.
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="security-clearance" class="section">
+        <h2 class="section-title">Security Classifications & Legal Framework</h2>
+        
+        <div class="term">
+            <h3 class="term-name">Security Clearance Levels</h3>
+            <p class="term-type">Information Access Control</p>
+            <div class="term-content">
+                <p>Hierarchical system controlling access to classified information and medical data.</p>
+                
+                <div class="code-block">
+LEVEL-1    - Public Health Information
+LEVEL-2    - Standard Medical Records  
+LEVEL-3    - Psychiatric Assessment Data
+LEVEL-4    - Neural Monitoring Results
+LEVEL-5    - Memory Modification History
+LEVEL-6    - Classified Research Data
+LEVEL-7    - Eyes Only - National Security
+LEVEL-8    - Revolutionary Guard Party
+LEVEL-9    - COSMIC - Nuclear/Strategic
+                </div>
+                
+                <div class="warning">
+                    <strong>Security Alert:</strong> Escalating clearance levels in patient files indicate deep government involvement and potential national security implications.
+                </div>
+            </div>
+        </div>
+        
+        <div class="term">
+            <h3 class="term-name">Iatrogenic Memory Modification</h3>
+            <p class="term-type">Medically-Induced Memory Alteration</p>
+            <div class="term-content">
+                <p>Memory modification resulting from medical or therapeutic intervention, whether intentional or as side effect of treatment.</p>
+                
+                <div class="clinical-significance">
+                    <strong>Clinical Significance:</strong> Distinguishes between naturally occurring amnesia and memory loss resulting from medical procedures. Important for determining treatment approach and legal liability.
+                </div>
+                
+                <div class="interpretation">
+                    <strong>Interpretation:</strong> Precise, selective memory modification patterns typically indicate intentional iatrogenic intervention rather than accidental side effects.
+                </div>
+            </div>
+        </div>
+        
+        <div class="term">
+            <h3 class="term-name">Neural Compliance Protocols</h3>
+            <p class="term-type">Behavioral Modification Framework</p>
+            <div class="term-content">
+                <p>Systematic approach to modifying behavior and cognitive patterns through neural intervention. Developed for post-war social reintegration and political optimization.</p>
+                
+                <div class="clinical-significance">
+                    <strong>Clinical Significance:</strong> Represents intersection of medical treatment and political control. May indicate state-sponsored behavioral modification programs.
+                </div>
+                
+                <div class="warning">
+                    <strong>Classification Warning:</strong> Neural compliance protocols classified at Congressional oversight level. Unauthorized access may indicate security breach or political dissidence.
+                </div>
+            </div>
+        </div>
+        
+        <div class="term">
+            <h3 class="term-name">Damnatio Memoriae Pattern</h3>
+            <p class="term-type">Systematic Memory Erasure</p>
+            <div class="term-content">
+                <p>Named after the Roman practice of erasing historical records. Refers to systematic, comprehensive memory deletion designed to eliminate all traces of specific persons, events, or information.</p>
+                
+                <div class="clinical-significance">
+                    <strong>Clinical Significance:</strong> Indicates state-sponsored memory modification for political purposes. Pattern suggests intentional erasure of politically sensitive or classified information.
+                </div>
+                
+                <div class="interpretation">
+                    <strong>Interpretation:</strong> Complete memory erasure with preserved neural pathways indicates advanced technological intervention. May suggest involvement in classified projects or political dissidence.
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <div class="section">
+        <h2 class="section-title">Emergency Protocols</h2>
+        <div class="warning">
+            <strong>CRITICAL ALERT PROCEDURES:</strong><br>
+            • Memory modification artifacts detected → Escalate to Federal Oversight Committee<br>
+            • Classified technology exposure → Activate Neural Security Protocol 7<br>
+            • Patient security risk identified → Contact National Security Council<br>
+            • Equipment malfunction during extraction → Emergency psychiatric hold<br>
+            • Unauthorized access attempt → DoD Neural Warfare Division
+        </div>
+        
+        <div class="meta-info" style="margin-top: 2rem; text-align: center;">
+            <strong>Document Control:</strong> Michigan Neurological Research Division<br>
+            <strong>Distribution:</strong> Authorized Medical Personnel Only<br>
+            <strong>Security Classification:</strong> MEDICAL-PROFESSIONAL<br>
+            <strong>Last Updated:</strong> 2039-03-15<br>
+            <strong>Next Review:</strong> 2039-06-15
+        </div>
+    </div>
+</body>
+</html>
