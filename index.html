@@ -346,6 +346,126 @@
             margin-bottom: 1rem;
             opacity: 0.3;
         }
+        
+        /* Tutorial Modal Styles */
+        .tutorial-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 32, 44, 0.85);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .tutorial-modal {
+            background: #ffffff;
+            border: 3px solid #2b6cb0;
+            border-radius: 8px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .tutorial-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 0.5rem;
+        }
+        
+        .tutorial-subtitle {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-bottom: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .tutorial-content {
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+        
+        .tutorial-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: #f7fafc;
+            border-radius: 4px;
+            border-left: 4px solid #2b6cb0;
+        }
+        
+        .tutorial-number {
+            background: #2b6cb0;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .tutorial-text {
+            font-size: 0.9rem;
+            color: #2d3748;
+            line-height: 1.4;
+        }
+        
+        .tutorial-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        
+        .tutorial-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .tutorial-btn-primary {
+            background: #2b6cb0;
+            color: white;
+        }
+        
+        .tutorial-btn-primary:hover {
+            background: #2c5282;
+        }
+        
+        .tutorial-btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        
+        .tutorial-btn-secondary:hover {
+            background: #cbd5e0;
+        }
+        
+        .highlight-pulse {
+            animation: highlightPulse 2s infinite;
+        }
+        
+        @keyframes highlightPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(43, 108, 176, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(43, 108, 176, 0.1); }
+        }
     </style>
 </head>
 <body>
@@ -399,6 +519,34 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- Tutorial Modal -->
+    <div id="tutorialOverlay" class="tutorial-overlay">
+        <div class="tutorial-modal">
+            <div class="tutorial-title">MindLog Clinical System v4.2.1</div>
+            <div class="tutorial-subtitle">New User Training Protocol | Michigan Neurological Research Division</div>
+            
+            <div id="tutorialContent" class="tutorial-content">
+                <div class="tutorial-step">
+                    <div class="tutorial-number">1</div>
+                    <div class="tutorial-text">Select a patient from the dropdown to access their neural extraction files</div>
+                </div>
+                <div class="tutorial-step">
+                    <div class="tutorial-number">2</div>
+                    <div class="tutorial-text">Browse thought extractions and clinical notes in the log panel</div>
+                </div>
+                <div class="tutorial-step">
+                    <div class="tutorial-number">3</div>
+                    <div class="tutorial-text">Access Clinical Reference guide for terminology and protocols</div>
+                </div>
+            </div>
+            
+            <div class="tutorial-buttons">
+                <button id="completeTutorial" class="tutorial-btn tutorial-btn-primary">Begin Session</button>
+                <button id="skipTutorial" class="tutorial-btn tutorial-btn-secondary">Skip Training</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -1924,9 +2072,59 @@ this case may document early recognition of systematic human rights violations.
             `;
         }
 
+        // Tutorial System
+        function initializeTutorial() {
+            const overlay = document.getElementById('tutorialOverlay');
+            const completeTutorial = document.getElementById('completeTutorial');
+            const skipTutorial = document.getElementById('skipTutorial');
+            
+            // Check if user has completed tutorial before
+            const hasSeenTutorial = localStorage.getItem('mindlog-tutorial-completed');
+            
+            if (!hasSeenTutorial) {
+                overlay.style.display = 'flex';
+            } else {
+                overlay.style.display = 'none';
+            }
+            
+            // Tutorial completion handlers
+            completeTutorial.addEventListener('click', () => {
+                localStorage.setItem('mindlog-tutorial-completed', 'true');
+                closeTutorial();
+                
+                // Add helpful highlighting for first-time users
+                setTimeout(() => {
+                    const patientSelect = document.getElementById('patientSelect');
+                    patientSelect.classList.add('highlight-pulse');
+                    
+                    setTimeout(() => {
+                        patientSelect.classList.remove('highlight-pulse');
+                    }, 4000);
+                }, 500);
+            });
+            
+            skipTutorial.addEventListener('click', () => {
+                localStorage.setItem('mindlog-tutorial-completed', 'true');
+                closeTutorial();
+            });
+            
+            // Close tutorial on overlay click
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    localStorage.setItem('mindlog-tutorial-completed', 'true');
+                    closeTutorial();
+                }
+            });
+            
+            function closeTutorial() {
+                overlay.style.display = 'none';
+            }
+        }
+        
         // Initialize the interface
         document.addEventListener('DOMContentLoaded', () => {
             initializePatientSelector();
+            initializeTutorial();
         });
     </script>
 </body>
