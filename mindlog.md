@@ -320,11 +320,11 @@ The MindLog format explores America in 2039, recovering from WW3, where algorith
 
 **Clark DeGuerre** - The Protagonist
 - Neural researcher caught in algorithmic precrime sweep
-- Childhood friend of Van Dyke, victim of memory modification
+- Childhood friend of Dave Van Dyke, victim of memory modification
 - Represents academic/intellectual class targeted by surveillance state
 - Struggles with trauma memories surfacing through dreams
 
-**Van Dyke Chen** - The Childhood Friend Turned Authority Figure  
+**Dave Van Dyke** - The Childhood Friend Turned Authority Figure  
 - Director of Michigan Nuclear Research Division (The Arcube)
 - Former Industrial Officer, War Production Board
 - Hypersexual performance optimization athlete
@@ -367,7 +367,7 @@ The MindLog format explores America in 2039, recovering from WW3, where algorith
 - Sexual behavior monitoring and therapeutic intervention
 
 **Psychological Themes:**
-- **Authority vs. Friendship:** Van Dyke's divided loyalties
+- **Authority vs. Friendship:** Dave Van Dyke's divided loyalties
 - **Revolutionary Ideals vs. Human Nature:** Heidi's traditional desires vs. political identity
 - **Performance of Sanity:** Laurel's treatment to appear mentally fit for power
 - **Memory as Political Weapon:** Clark's suppressed trauma as state secret
