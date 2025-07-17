@@ -183,14 +183,18 @@ Born in the lakeshore area of Michigan, Zoe attended University of Michigan and 
 
 **Family Dynamics**: "Father's brain, mother's looks"—inherited brilliant intellect from speed-reading, high-functioning father and beauty from supermodel mother who treated father like ATM. Sweeps family toxicity under the rug through extreme loyalty and high-functioning excellence.
 
-**The Central Violation**: During the Third World War, her eggs were harvested by the state for the war effort. Her reproductive capacity was stolen by the Revolutionary Government she now serves, creating the core trauma of her existence.
+**The Suppressed Past**: Before the war, during medical residency, Zoe made the responsible choice to freeze her eggs for future use. She was married at the time, but the relationship fell apart under the stress of her medical training and the pre-war chaos - a traumatic divorce that wasn't pretty. All of these memories - the marriage, the divorce, the decision to preserve her fertility - were erased during post-war "Revolutionary Therapy" programs designed to help citizens process war trauma.
+
+**The Automated Trigger**: Years later, she receives an automated notification from the University fertility clinic: her frozen eggs require action or they will be discarded. This message was sent by outdated systems that weren't updated after her memory erasure. The notification creates a devastating psychological crisis as suppressed desires and trauma begin surfacing from her subconscious.
 
 ### 2039 Psychological Profile  
 **Reproduction as Core Identity**: Had pregnancy fantasies as a child—would put pillow under shirt pretending to be pregnant. Reproduction isn't just desire; it's core identity formation. Always wanted a child before 30, regardless of relationship status.
 
-**Revolutionary Conformity vs. Biological Drive**: Supports family abolition despite deepest personal desires. Feels ashamed for wanting "backward" traditional family structure. The Revolutionary Government's ideology directly conflicts with her biological programming.
+**Revolutionary Conformity vs. Biological Drive**: Supports family abolition despite deepest personal desires. Feels ashamed for wanting "backward" traditional family structure. The Revolutionary Government's ideology directly conflicts with her biological programming, but she doesn't understand why she feels this way.
 
-**Optogenetic Tragedy**: Underwent memory erasure to delete negative emotions about her childlessness, but "latent negativity" and biological instincts remain. Creates internal war between artificial happiness and authentic grief.
+**Optogenetic Tragedy**: Underwent memory erasure to delete the trauma of her failed marriage and associated grief, but the underlying emotional patterns and biological instincts remain. The fertility clinic notification triggers a cascade of suppressed memories and desires that her conscious mind can't process or understand. Creates internal war between artificial contentment and authentic, inexplicable grief.
+
+**The Perfect Life Illusion**: Genuinely believes her current life is ideal and the Revolutionary system is perfect, but experiences unexplained emotional episodes, anxiety around families, and overwhelming maternal urges that don't fit her worldview. The cognitive dissonance between her "perfect" surface life and bubbling subconscious trauma creates increasing psychological pressure.
 
 **Beauty Trauma**: Extremely attractive but naive about its impact. Friend group abandoned her in middle school due to sexual jealousy over large breasts and model figure. Never developed skills to handle male attention or female aggression.
 
@@ -222,13 +226,17 @@ Born in the lakeshore area of Michigan, Zoe attended University of Michigan and 
 **Phase 4**: Integration of maternal desires with Revolutionary world or underground resistance
 
 ### Fragment Writing Opportunities
+- The moment she receives the fertility clinic notification and doesn't understand why it affects her so deeply
 - Artificial positivity cracks: "I should be grateful for my career... why do I feel empty?"
 - Suppressed maternal instincts triggered by patients' children
+- Phantom emotional reactions to divorce/relationship content without understanding why
+- Inexplicable anxiety when encountering happy families or pregnant women
 - Fandom escapism using fictional families to process unexpressed nurturing needs
-- Obsessive thoughts about tracking down harvested genetic material
-- Revolutionary guilt—self-hatred for wanting "backward" traditional family
+- Revolutionary guilt—self-hatred for wanting "backward" traditional family structure
 - Memory gaps when optogenetic erasure conflicts with remaining emotional echoes
 - Physical betrayal: body still responds to children despite mental conditioning
+- Desperate attempts to research her own past while being monitored by the system
+- The horror of discovering evidence of her erased life (medical records, photos, documents)
 
 ### Coping Mechanisms
 - **Work Obsession**: Pediatric excellence as socially acceptable outlet for maternal instincts

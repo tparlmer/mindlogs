@@ -4,6 +4,7 @@
 ---
 
 ## CLARK DEGUERRE
+Enkidu?
 **Role**: Protagonist / Hero  
 **Age**: 47 (born 1992)  
 **Appearance**: Looks his age - weathered, authentic human aging in contrast to enhanced peers  
@@ -53,6 +54,7 @@ Born in the lakeshore area of Michigan, Clark attended the University of Michiga
 ---
 
 ## DAVE VAN DYKE
+Gilgamesh
 **Role**: Antihero / Complex Friend  
 **Age**: 47 (born 1992)  
 **Appearance**: Late 20s/early 30s through life extension treatments  
@@ -110,6 +112,7 @@ Born in the lakeshore area of Michigan, Dave attended University of Michigan whe
 ---
 
 ## AMY MACARTHUR
+ISHTAR
 **Role**: Antagonist / Aspiring Villain  
 **Age**: 47 (born 1992)  
 **Appearance**: Late 20s/early 30s through enhancement treatments  

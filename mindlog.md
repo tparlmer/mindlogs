@@ -55,6 +55,7 @@ https://www.sciencealert.com/new-mind-reading-ai-translates-thoughts-directly-fr
 https://en.wikipedia.org/wiki/Engram_(neuropsychology)
 https://en.wikipedia.org/wiki/Memory_consolidation
 https://www.nature.com/articles/s41467-024-46926-0
+https://www.nudge.com/
 
 ## Concept Overview
 
